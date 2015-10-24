@@ -9,13 +9,13 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <string>
-#include <queue>
+#include <errno.h>
 
 std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
     parseInput(std::string s);
 void printCommands(const std::vector<std::vector<std::string> >& v);
 void printConnectors(std::queue<std::string> q);
-void executeSingle(std::vector<std::string> v);
+bool executeSingle(std::vector<std::string> v);
 std::vector<char*> toCharPointers(std::vector<std::string>& v);
 
 int main()
@@ -28,12 +28,12 @@ int main()
     // of connectors on its .second
     std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
         parsedPair = parseInput(userInput);
-    
+
     // Tests look good
     // printCommands(parsedPair.first);
     // printConnectors(parsedPair.second);
-    
-    executeSingle(parsedPair.first.at(0));
+    bool b = executeSingle(parsedPair.first.at(0));
+    std::cout << b << std::endl;
 
     return 0;
 }
@@ -123,7 +123,7 @@ void printConnectors(std::queue<std::string> q)
 }
 
 // Execute execvp on one command (a single vector of strings)
-void executeSingle(std::vector<std::string> v)
+bool executeSingle(std::vector<std::string> v)
 {
     // Prepare char** object to be passed into execvp
     std::vector<char*> vecChars = toCharPointers(v);
@@ -132,32 +132,42 @@ void executeSingle(std::vector<std::string> v)
     
     // Start execvp process
     int status;
-    int sysValue = 0;
+    int exeVal;
     pid_t processID = fork();
-    if(processID < 0)
+    if(processID < 0)   // processID of less than 0 means the fork failed
     {
         perror("fork failed");
         exit(1);
     }
+    // Child Process
     else if(processID == 0)
     {
-        sysValue = execvp(listCommands[0], listCommands);
-
-        if(sysValue == -1)
-        {
-            perror("execvp failed");
-            exit(1);
-        }
+        execvp(listCommands[0], listCommands);
+        perror("execvp failed");
+        exit(errno);
     }
+    // Parent Process
     else
     {
-        sysValue = waitpid(processID, &status, 0);
-
-        if(sysValue == -1)
+        // Wait until child process is finished.
+        // If wait(&status) is less than 0, means wait syscall failed.
+        if((processID = wait(&status)) < 0)
         {
-            perror("wait failed");
+            perror("wait");
             exit(1);
         }
+        
+        // set exeVal to how the child process terminated.
+        if(WIFEXITED(status))
+        {
+            exeVal = WEXITSTATUS(status);
+        }
+        
+        // exeVal == 0 means that the child process successfully ran
+        // Otherwise, that means there was an error with the process.
+        if(exeVal == 0)
+            return true;
+        return false;
     }
 }
 
