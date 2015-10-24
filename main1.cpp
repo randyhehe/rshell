@@ -20,20 +20,24 @@ std::vector<char*> toCharPointers(std::vector<std::string>& v);
 
 int main()
 {
-    // Get user input
-    std::string userInput;
-    std::getline(std::cin, userInput);
+    for(;;)
+    {
+        // Get user input
+        std::string userInput;
+        std::getline(std::cin, userInput);
+        
+        // If user inputs exit, end program
+        if(userInput == "exit")
+            exit(0);
     
-    // parsedPair holds the list of commands on its .first, and holds the list
-    // of connectors on its .second
-    std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
-        parsedPair = parseInput(userInput);
+        // parsedPair holds the list of commands on its .first, and holds
+        // the list of connectors on its .second
+        std::pair<std::vector<std::vector<std::string> >, 
+            std::queue<std::string> > parsedPair = parseInput(userInput);
 
-    // Tests look good
-    // printCommands(parsedPair.first);
-    // printConnectors(parsedPair.second);
-    bool b = executeSingle(parsedPair.first.at(0));
-    std::cout << b << std::endl;
+        // correctedExecuted = 1 if executeSingle returned with no errors.
+        bool correctlyExecuted = executeSingle(parsedPair.first.at(0));
+    }
 
     return 0;
 }
