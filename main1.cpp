@@ -3,11 +3,20 @@
 #include <queue>
 #include <utility>
 #include <sstream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <string>
+#include <queue>
 
 std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
     parseInput(std::string s);
 void printCommands(const std::vector<std::vector<std::string> >& v);
 void printConnectors(std::queue<std::string> q);
+void executeSingle(std::vector<std::string> v);
+std::vector<char*> toCharPointers(std::vector<std::string>& v);
 
 int main()
 {
@@ -21,8 +30,10 @@ int main()
         parsedPair = parseInput(userInput);
     
     // Tests look good
-    printCommands(parsedPair.first);
-    printConnectors(parsedPair.second);
+    // printCommands(parsedPair.first);
+    // printConnectors(parsedPair.second);
+    
+    executeSingle(parsedPair.first.at(0));
 
     return 0;
 }
@@ -109,4 +120,54 @@ void printConnectors(std::queue<std::string> q)
         q.pop();
     }
     std::cout << std::endl;
+}
+
+// Execute execvp on one command (a single vector of strings)
+void executeSingle(std::vector<std::string> v)
+{
+    // Prepare char** object to be passed into execvp
+    std::vector<char*> vecChars = toCharPointers(v);
+    vecChars.push_back(NULL);
+    char** listCommands = &vecChars[0];
+    
+    // Start execvp process
+    int status;
+    int sysValue = 0;
+    pid_t processID = fork();
+    if(processID < 0)
+    {
+        perror("fork failed");
+        exit(1);
+    }
+    else if(processID == 0)
+    {
+        sysValue = execvp(listCommands[0], listCommands);
+
+        if(sysValue == -1)
+        {
+            perror("execvp failed");
+            exit(1);
+        }
+    }
+    else
+    {
+        sysValue = waitpid(processID, &status, 0);
+
+        if(sysValue == -1)
+        {
+            perror("wait failed");
+            exit(1);
+        }
+    }
+}
+
+// Creates a vector of character pointers based on the passed in
+// vector of strings.
+std::vector<char*> toCharPointers(std::vector<std::string>& v)
+{
+    std::vector<char *> c;
+    for(int i = 0; i < v.size(); i++)
+        c.push_back(&v[i][0]);
+
+    return c;
 }
