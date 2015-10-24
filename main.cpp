@@ -8,8 +8,10 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <string>
+#include <queue>
 
-std::vector<std::vector<std::string> > splitCommands(std::string str);
+std::vector<std::vector<std::string> > splitCommands
+    (std::string str, std::queue<std::string>& q);
 std::vector<char *> stringToChar(std::vector<std::string>& s);
 bool isConnector(std::string s);
 
@@ -21,9 +23,25 @@ int main(int argc, char** argv)
         if(userInput == "exit")
         exit(0);
         
+        //
+        std::queue<std::string> qCommands;
+
+        std::cout << qCommands.size() << std::endl;
+
         //vecStrings holds all the commands 
         std::vector<std::vector<std::string> > 
-            userCommands = splitCommands(userInput);
+            userCommands = splitCommands(userInput, qCommands);
+
+        std::cout << "Overall size: " << userCommands.size() << std::endl;
+        for(int i = 0; i < userCommands.size(); i++)
+        {
+            for(int j = 0; j < userCommands.at(i).size(); j++)
+            {
+                std::cout << userCommands.at(i).at(j) << std::endl;
+            }
+            std::cout << "Size: " << userCommands.at(i).size() << std::endl;
+        }
+
 
         std::vector<char* > test = stringToChar(userCommands.at(0));
         test.push_back(NULL);
@@ -91,7 +109,8 @@ int main(int argc, char** argv)
 //    }
 
 // Splits a string of sentences to a vector of words
-std::vector<std::vector<std::string> > splitCommands(std::string str)
+std::vector<std::vector<std::string> > splitCommands
+    (std::string str, std::queue<std::string>& q)
 {
     std::vector<std::vector<std::string> > vectorWords;
     std::vector<std::string> emptyVector;
@@ -110,13 +129,13 @@ std::vector<std::vector<std::string> > splitCommands(std::string str)
         {
             singleWord = singleWord.substr(0, singleWord.size() - 1);
             vectorWords.at(index).push_back(singleWord);
-            vectorWords.at(index).push_back(";");
+            q.push(";");
             index++;
             vectorWords.push_back(emptyVector);
         }
         else if(singleWord == "||" || singleWord == "&&" || singleWord == ";")
         {
-            vectorWords.at(index).push_back(singleWord);
+            q.push(singleWord);
             index++;
             vectorWords.push_back(emptyVector);
         }
