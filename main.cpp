@@ -3,13 +3,15 @@
 #include <queue>
 #include <utility>
 #include <sstream>
+#include <string>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <sys/wait.h>
-#include <string>
 #include <errno.h>
+#include <limits.h>
+#include <pwd.h>
 
 #include "And.h"
 #include "Or.h"
@@ -18,6 +20,8 @@
 
 std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
     parseInput(std::string s);
+void executeAll(std::pair<std::vector<std::vector<std::string> >,
+    std::queue<std::string> > p);
 void printCommands(const std::vector<std::vector<std::string> >& v);
 void printConnectors(std::queue<std::string> q);
 bool executeSingle(std::vector<std::string> v);
@@ -25,9 +29,19 @@ std::vector<char*> toCharPointers(std::vector<std::string>& v);
 
 int main()
 {
+    // Store hostname into character array object hostname
+    char hostname[HOST_NAME_MAX];
+    gethostname(hostname, HOST_NAME_MAX);
+
+    // Store username to login object
+    struct passwd *pws;
+    pws = getpwuid(geteuid());
+    std::string login = pws->pw_name;
+
     for(;;)
     {
-        std::cout << "$ ";
+        // Output login and hostname
+        std::cout << login << "@" << hostname << "$ ";
 
         // Get user input
         std::string userInput;
@@ -42,42 +56,45 @@ int main()
         std::pair<std::vector<std::vector<std::string> >, 
             std::queue<std::string> > parsedPair = parseInput(userInput);
 
-        // correctedExecuted = 1 if executeSingle returned with no errors.
-        bool correctlyExecuted;
-        for(int i = 0; i < parsedPair.first.size(); i++)
+        executeAll(parsedPair);
+    }
+
+    return 0;
+}
+
+void executeAll(std::pair<std::vector<std::vector<std::string> >,
+        std::queue<std::string> > p)
+{   
+    // correctlyExecuted = 1 if executeSingle returned with no errors.
+    bool correctlyExecuted;
+    for(int i = 0; i < p.first.size(); i++)
+    {
+        if(i == 0)
+            correctlyExecuted = executeSingle(p.first.at(i));
+        else
         {
-            if(i == 0)
-                correctlyExecuted = executeSingle(parsedPair.first.at(i));
-            else
+            std::string connector = p.second.front();
+            p.second.pop();
+            if(connector == "&&")
             {
-                std::string connector = parsedPair.second.front();
-                parsedPair.second.pop();
-                if(connector == "&&")
-                {
-                    And a(correctlyExecuted);
-                    if(a.executeNext())
-                        correctlyExecuted = 
-                            executeSingle(parsedPair.first.at(i));
-                }
+                And a(correctlyExecuted);
+                if(a.executeNext())
+                    correctlyExecuted = executeSingle(p.first.at(i));
                 else if(connector == "||")
                 {
                     Or o(correctlyExecuted);
                     if(o.executeNext())
-                        correctlyExecuted = 
-                            executeSingle(parsedPair.first.at(i));
+                        correctlyExecuted = executeSingle(p.first.at(i));
                 }
-                else if(connector == ";")
+                else if(connector ==";")
                 {
                     Semicolon semicolon(correctlyExecuted);
                     if(semicolon.executeNext())
-                        correctlyExecuted = 
-                            executeSingle(parsedPair.first.at(i));
+                        correctlyExecuted = executeSingle(p.first.at(i));
                 }
             }
         }
     }
-
-    return 0;
 }
 
 // Returns a pair of vector<vector<string>> and queue<string>
@@ -109,6 +126,7 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
         if(*singleWord.rbegin() == ';' && singleWord.size() > 1)
         {
             singleWord = singleWord.substr(0, singleWord.size() - 1);
+
             vecCommands.at(index).push_back(singleWord);
             queueConnectors.push(";");
             
