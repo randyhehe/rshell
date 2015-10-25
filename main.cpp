@@ -26,12 +26,18 @@ void printCommands(const std::vector<std::vector<std::string> >& v);
 void printConnectors(std::queue<std::string> q);
 bool executeSingle(std::vector<std::string> v);
 std::vector<char*> toCharPointers(std::vector<std::string>& v);
+char* getHost();
 
 int main()
 {
     // Store hostname into character array object hostname
     char hostname[HOST_NAME_MAX];
-    gethostname(hostname, HOST_NAME_MAX);
+    int status = gethostname(hostname, HOST_NAME_MAX);
+    if(status != 0)
+    {
+        perror("gethostname failed");
+        exit(errno);
+    }
 
     // Store username to login object
     struct passwd *pws;
@@ -80,19 +86,20 @@ void executeAll(std::pair<std::vector<std::vector<std::string> >,
                 And a(correctlyExecuted);
                 if(a.executeNext())
                     correctlyExecuted = executeSingle(p.first.at(i));
-                else if(connector == "||")
-                {
-                    Or o(correctlyExecuted);
-                    if(o.executeNext())
-                        correctlyExecuted = executeSingle(p.first.at(i));
-                }
-                else if(connector ==";")
-                {
-                    Semicolon semicolon(correctlyExecuted);
-                    if(semicolon.executeNext())
-                        correctlyExecuted = executeSingle(p.first.at(i));
-                }
             }
+            else if(connector == "||")
+            {
+                Or o(correctlyExecuted);
+                if(o.executeNext())
+                    correctlyExecuted = executeSingle(p.first.at(i));
+            }
+            else if(connector == ";")
+            {
+                Semicolon semicolon(correctlyExecuted);
+                if(semicolon.executeNext())
+                    correctlyExecuted = executeSingle(p.first.at(i));
+            }
+            
         }
     }
 }
@@ -121,22 +128,8 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
         std::string singleWord;
         iSS >> singleWord;
 
-        // If ; is at the end of any word, add it into the connectors queue and
-        // add the word without the semicolon into vecCommands
-        if(*singleWord.rbegin() == ';' && singleWord.size() > 1)
-        {
-            singleWord = singleWord.substr(0, singleWord.size() - 1);
-
-            vecCommands.at(index).push_back(singleWord);
-            queueConnectors.push(";");
-            
-            // Connector means the current execution is over and a new 
-            // action will be taking place.
-            index++;
-            vecCommands.push_back(emptyVector);
-        }
         // If a word consists of only ||, &&, or ; add into connectors queue
-        else if(singleWord == "||" || singleWord == "&&" || singleWord == ";")
+        if(singleWord == "||" || singleWord == "&&" || singleWord == ";")
         {
             queueConnectors.push(singleWord);
             
@@ -145,11 +138,78 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
             index++;
             vecCommands.push_back(emptyVector);
         }
-        // In the case of a regular word, simply push into vector of commands
+
         else
-            vecCommands.at(index).push_back(singleWord);
-        
-    } while(iSS.good());
+        {
+
+            // Calculate the number of semicolons in the singleWord
+            int numSemicolons = 0;
+            for(int i = 0; i < singleWord.size(); i++)
+            {
+                if(singleWord.at(i) == ';')
+                    numSemicolons++;  
+            }
+            
+            // If number of semicolons is zero, then push back the word
+            if(numSemicolons == 0)
+            {
+                vecCommands.at(index).push_back(singleWord);
+                goto label;
+            }
+            
+            // If number of semicolons is greater than 1, then error
+            if(numSemicolons > 1)
+            {
+                std::cout << "Syntax error." << std::endl;
+                exit(1);
+            }
+            
+            // Case when semicolon is at the end of a word or front of word
+            if(*singleWord.rbegin() == ';' || *singleWord.begin() == ';')
+            {
+                if(*singleWord.rbegin() == ';')
+                {
+                    singleWord = singleWord.substr(0, singleWord.size() - 1);
+                    vecCommands.at(index).push_back(singleWord);
+                    vecCommands.push_back(emptyVector);
+                    index++;
+                }
+                else if(*singleWord.begin() == ';')
+                {
+                    singleWord = singleWord.substr(1, singleWord.size() - 1);
+                    index++;
+                    vecCommands.push_back(emptyVector);
+                    vecCommands.at(index).push_back(singleWord);
+                }
+                queueConnectors.push(";");
+            }
+            
+            // Case when semicolon is in the middle of a word
+            else
+            {
+                std::string frontWord;
+                std::string backWord;
+                for(int i = 0; i < singleWord.size(); i++)
+                {
+                    if(singleWord.at(i) == ';')
+                    {
+                        frontWord = singleWord.substr(0, i);
+                        backWord = singleWord.substr
+                            (i + 1, singleWord.size() - frontWord.size() - 1);
+                    }
+                }
+
+                vecCommands.at(index).push_back(frontWord);
+                queueConnectors.push(";");
+                index++;
+                vecCommands.push_back(emptyVector);
+                vecCommands.at(index).push_back(backWord);
+                
+            }
+            label:;
+        } 
+    }
+    while(iSS.good());
     
     return std::make_pair(vecCommands, queueConnectors);
 }
@@ -213,7 +273,7 @@ bool executeSingle(std::vector<std::string> v)
         // If wait(&status) is less than 0, means wait syscall failed.
         if((processID = wait(&status)) < 0)
         {
-            perror("wait");
+            perror("wait failed");
             exit(1);
         }
         
