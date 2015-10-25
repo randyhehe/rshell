@@ -86,6 +86,8 @@ void executeAll(std::pair<std::vector<std::vector<std::string> >,
                 correctlyExecuted = executeSingle(p.first.at(i));
             else if(connector == ";")
                 correctlyExecuted = executeSingle(p.first.at(i));
+            else if(connector == "#")
+                return;
             
         }
     }
@@ -123,7 +125,8 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
         iSS >> singleWord;
 
         // If a word consists of only ||, &&, or ; add into connectors queue
-        if(singleWord == "||" || singleWord == "&&" || singleWord == ";")
+        if(singleWord == "||" || singleWord == "&&" 
+                || singleWord == ";" || singleWord == "#")
         {
             if(doubleConnector == true)
             {
@@ -145,6 +148,12 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
         {
             doubleConnector = false;
 
+            if(*singleWord.begin() == '#')
+            {
+                queueConnectors.push("#");
+                goto label;
+            }
+
             // Calculate the number of semicolons in the singleWord
             numSemicolons = 0;
             for(int i = 0; i < singleWord.size(); i++)
@@ -164,7 +173,7 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
             if(numSemicolons > 1)
             {
                 std::cout << "Syntax error." << std::endl;
-                b= false;
+                b = false;
                 goto label;
             }
             
