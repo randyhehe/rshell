@@ -19,7 +19,7 @@
 #include "Connector.h"
 
 std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
-    parseInput(std::string s);
+    parseInput(std::string s, bool& b);
 void executeAll(std::pair<std::vector<std::vector<std::string> >,
     std::queue<std::string> > p);
 void printCommands(const std::vector<std::vector<std::string> >& v);
@@ -59,10 +59,13 @@ int main()
     
         // parsedPair holds the list of commands on its .first, and holds
         // the list of connectors on its .second
+        bool correctSyntax = true;
         std::pair<std::vector<std::vector<std::string> >, 
-            std::queue<std::string> > parsedPair = parseInput(userInput);
-
-        executeAll(parsedPair);
+            std::queue<std::string> > parsedPair = 
+                parseInput(userInput, correctSyntax);
+        
+        if(correctSyntax)
+            executeAll(parsedPair);
     }
 
     return 0;
@@ -108,8 +111,10 @@ void executeAll(std::pair<std::vector<std::vector<std::string> >,
 // The vector<vector<string>> is a 3D vector that sorts each execution into 
 // a outer vector, with all the separate words in the inner vector.
 // The queue<string> stores all the connectors.
+// b is returned by reference and will tell to main function whether
+// there are any syntax errors
 std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
-    parseInput(std::string s)
+    parseInput(std::string s, bool& b)
 {
     // Initialize vecCommands with an emptyVector (size = 1)
     std::vector<std::vector<std::string> > vecCommands;
@@ -117,6 +122,11 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
     vecCommands.push_back(emptyVector);
     // index will keep track of what index the vecCommands vector will be in
     int index = 0;
+
+    // this boolean keeps track of invalid inputs of double connectors
+    bool doubleConnector = false;
+
+    int numSemicolons = 0;
 
     std::queue<std::string> queueConnectors;
 
@@ -131,6 +141,14 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
         // If a word consists of only ||, &&, or ; add into connectors queue
         if(singleWord == "||" || singleWord == "&&" || singleWord == ";")
         {
+            if(doubleConnector == true)
+            {
+                std::cout << "Syntax error." << std::endl;
+                b = false;
+                goto label;
+            }
+            doubleConnector = true;
+
             queueConnectors.push(singleWord);
             
             // Connector means the current execution is over and a new
@@ -141,9 +159,10 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
 
         else
         {
+            doubleConnector = false;
 
             // Calculate the number of semicolons in the singleWord
-            int numSemicolons = 0;
+            numSemicolons = 0;
             for(int i = 0; i < singleWord.size(); i++)
             {
                 if(singleWord.at(i) == ';')
@@ -161,7 +180,8 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
             if(numSemicolons > 1)
             {
                 std::cout << "Syntax error." << std::endl;
-                exit(1);
+                b= false;
+                goto label;
             }
             
             // Case when semicolon is at the end of a word or front of word
