@@ -15,6 +15,8 @@
 
 std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
     parseInput(std::string s, bool& b);
+void check(std::string singleWord, std::string keyword, bool& b, int& index,
+        std::vector<std::vector<std::string> >& v, std::queue<std::string>& q);
 void executeAll(std::pair<std::vector<std::vector<std::string> >,
     std::queue<std::string> > p);
 void printCommands(const std::vector<std::vector<std::string> >& v);
@@ -62,7 +64,6 @@ int main()
         if(correctSyntax)
             executeAll(parsedPair);
     }
-
     return 0;
 }
 
@@ -112,10 +113,7 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
     // this boolean keeps track of invalid inputs of double connectors
     bool doubleConnector = false;
 
-    int numSemicolons = 0;
-
     std::queue<std::string> queueConnectors;
-
     // Read from string until completely parsed
     std::istringstream iSS(s);
     do
@@ -132,7 +130,7 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
             {
                 std::cout << "Syntax error." << std::endl;
                 b = false;
-                goto label;
+                break;
             }
             doubleConnector = true;
 
@@ -144,83 +142,25 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
             vecCommands.push_back(emptyVector);
         }
 
+        // Hash
+        else if(*singleWord.begin() == '#')
+            queueConnectors.push("#");
+        // Semicolons
+        else if(singleWord.find(";") != std::string::npos)
+            check(singleWord, ";", b, index, vecCommands, queueConnectors);
+        // And
+        else if(singleWord.find("&&") != std::string::npos)
+            check(singleWord, "&&", b, index, vecCommands, queueConnectors);
+        // Or
+        else if(singleWord.find("||") != std::string::npos)
+            check(singleWord, "||", b, index, vecCommands, queueConnectors);
+        //else, the word has no special connectors and can just be pushed back
         else
         {
+            vecCommands.at(index).push_back(singleWord);
             doubleConnector = false;
+        }
 
-            if(*singleWord.begin() == '#')
-            {
-                queueConnectors.push("#");
-                goto label;
-            }
-
-            // Calculate the number of semicolons in the singleWord
-            numSemicolons = 0;
-            for(int i = 0; i < singleWord.size(); i++)
-            {
-                if(singleWord.at(i) == ';')
-                    numSemicolons++;  
-            }
-            
-            // If number of semicolons is zero, then push back the word
-            if(numSemicolons == 0)
-            {
-                vecCommands.at(index).push_back(singleWord);
-                goto label;
-            }
-            
-            // If number of semicolons is greater than 1, then error
-            if(numSemicolons > 1)
-            {
-                std::cout << "Syntax error." << std::endl;
-                b = false;
-                goto label;
-            }
-            
-            // Case when semicolon is at the end of a word or front of word
-            if(*singleWord.rbegin() == ';' || *singleWord.begin() == ';')
-            {
-                if(*singleWord.rbegin() == ';')
-                {
-                    singleWord = singleWord.substr(0, singleWord.size() - 1);
-                    vecCommands.at(index).push_back(singleWord);
-                    vecCommands.push_back(emptyVector);
-                    index++;
-                }
-                else if(*singleWord.begin() == ';')
-                {
-                    singleWord = singleWord.substr(1, singleWord.size() - 1);
-                    index++;
-                    vecCommands.push_back(emptyVector);
-                    vecCommands.at(index).push_back(singleWord);
-                }
-                queueConnectors.push(";");
-            }
-            
-            // Case when semicolon is in the middle of a word
-            else
-            {
-                std::string frontWord;
-                std::string backWord;
-                for(int i = 0; i < singleWord.size(); i++)
-                {
-                    if(singleWord.at(i) == ';')
-                    {
-                        frontWord = singleWord.substr(0, i);
-                        backWord = singleWord.substr
-                            (i + 1, singleWord.size() - frontWord.size() - 1);
-                    }
-                }
-
-                vecCommands.at(index).push_back(frontWord);
-                queueConnectors.push(";");
-                index++;
-                vecCommands.push_back(emptyVector);
-                vecCommands.at(index).push_back(backWord);
-                
-            }
-            label:;
-        } 
     }
     while(iSS.good());
     
@@ -314,3 +254,94 @@ std::vector<char*> toCharPointers(std::vector<std::string>& v)
 
     return c;
 }
+
+// Helper function for parseInput. Takes in a connector as keyword and helps
+// parse when connector is part of the singleWord
+void check(std::string singleWord, std::string keyword, bool& b, int& index,
+        std::vector<std::vector<std::string> >& v, std::queue<std::string>& q)
+{
+    std::vector<std::string> emptyVector;   
+    int num = 0;
+    int sizeKey = keyword.size();
+    
+    for(int i = 0; i < singleWord.size() - keyword.size() + 1; i++)
+    {
+        if(keyword.size() == 1 && singleWord.at(i) == keyword.at(0))
+            num++;
+
+        else if(keyword.size() == 2 && singleWord.at(i) == keyword.at(0)
+                && singleWord.at(i + 1) == keyword.at(1))
+            num++;
+    }
+
+    if(num > 1)
+    {
+        std::cout << "Syntax error." << std::endl;
+        b = false;
+    }
+    
+    else if(*singleWord.rbegin() == keyword.at(0))
+    {
+        if(keyword.size() == 2 && *(singleWord.rbegin()--) == keyword.at(1))
+            singleWord = singleWord.substr(0, singleWord.size() - 2);
+        else if(keyword.size() == 1)
+            singleWord = singleWord.substr(0, singleWord.size() - 1);
+
+        v.at(index).push_back(singleWord);
+        v.push_back(emptyVector);
+        index++;
+        q.push(keyword);
+    }
+
+    else if(*singleWord.begin() == keyword.at(0))
+    {
+        if(keyword.size() == 2 && *(singleWord.begin()++) - 2)
+            singleWord = singleWord.substr(2, singleWord.size() - 2);
+        else if(keyword.size() == 1)
+            singleWord = singleWord.substr(1, singleWord.size() - 1);
+
+        index++;
+        v.push_back(emptyVector);
+        v.at(index).push_back(singleWord);
+        q.push(keyword);
+    }
+
+    else
+    {
+        std::string frontWord;
+        std::string backWord;
+        
+        if(keyword.size() == 2)
+        {
+            for(int i = 0; i < singleWord.size(); i++)
+            {
+                if(singleWord.at(i) == keyword.at(0))
+                {
+                    frontWord = singleWord.substr(0, i);
+                    backWord = singleWord.substr
+                        (i + 2, singleWord.size() - frontWord.size() - 2);
+                    break;
+                }
+            }
+        }
+        else if(keyword.size() == 1)
+        {
+            for(int i = 0; i < singleWord.size(); i++)
+            {
+                if(singleWord.at(i) == keyword.at(0))
+                {
+                    frontWord = singleWord.substr(0, i);
+                    backWord = singleWord.substr
+                        (i + 1, singleWord.size() - frontWord.size() - 1);
+                    break;
+                }
+            }
+        }
+        v.at(index).push_back(frontWord);
+        q.push(keyword);
+        index++;
+        v.push_back(emptyVector);
+        v.at(index).push_back(backWord);
+    }
+}
+
