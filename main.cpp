@@ -89,7 +89,6 @@ void executeAll(std::pair<std::vector<std::vector<std::string> >,
                 correctlyExecuted = executeSingle(p.first.at(i));
             else if(connector == "#")
                 return;
-            
         }
     }
 }
@@ -126,7 +125,14 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
         if(singleWord == "||" || singleWord == "&&" 
                 || singleWord == ";" || singleWord == "#")
         {
-            if(doubleConnector == true)
+            // Error on leading connectors
+            if(vecCommands.size() == 1 && vecCommands.at(0).empty())
+            {
+                std::cout << "Syntax error." << std::endl;
+                break;
+            }
+
+            else if(doubleConnector == true)
             {
                 std::cout << "Syntax error." << std::endl;
                 b = false;
@@ -142,16 +148,16 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
             vecCommands.push_back(emptyVector);
         }
 
-        // Hash
+        // Hash in beginning of word
         else if(*singleWord.begin() == '#')
             queueConnectors.push("#");
-        // Semicolons
+        // Semicolons in word
         else if(singleWord.find(";") != std::string::npos)
             check(singleWord, ";", b, index, vecCommands, queueConnectors);
-        // And
+        // And in word
         else if(singleWord.find("&&") != std::string::npos)
             check(singleWord, "&&", b, index, vecCommands, queueConnectors);
-        // Or
+        // Or in word
         else if(singleWord.find("||") != std::string::npos)
             check(singleWord, "||", b, index, vecCommands, queueConnectors);
         //else, the word has no special connectors and can just be pushed back
@@ -295,7 +301,13 @@ void check(std::string singleWord, std::string keyword, bool& b, int& index,
 
     else if(*singleWord.begin() == keyword.at(0))
     {
-        if(keyword.size() == 2 && *(singleWord.begin()++) - 2)
+        // Error on leading connectors
+        if(v.size() == 1 && v.at(0).empty())
+        {
+            std::cout << "Syntax error." << std::endl;
+            b = false;
+        }
+        else if(keyword.size() == 2 && *(singleWord.begin()++) - 2)
             singleWord = singleWord.substr(2, singleWord.size() - 2);
         else if(keyword.size() == 1)
             singleWord = singleWord.substr(1, singleWord.size() - 1);
