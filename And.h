@@ -5,6 +5,7 @@
 class And : public Connector
 {
     public:
+        And(bool b);
         bool executeNext();
 };
 

@@ -5,6 +5,7 @@
 class Or : public Connector
 {
     public:
+        Or(bool b);
         bool executeNext();
 };
 

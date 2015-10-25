@@ -5,6 +5,7 @@
 class Semicolon : public Connector
 {
     public:
+        Semicolon(bool b);
         bool executeNext();
 };
 
