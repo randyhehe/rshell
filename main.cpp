@@ -13,11 +13,6 @@
 #include <limits.h>
 #include <pwd.h>
 
-#include "And.h"
-#include "Or.h"
-#include "Semicolon.h"
-#include "Connector.h"
-
 std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
     parseInput(std::string s, bool& b);
 void executeAll(std::pair<std::vector<std::vector<std::string> >,
@@ -84,24 +79,13 @@ void executeAll(std::pair<std::vector<std::vector<std::string> >,
         {
             std::string connector = p.second.front();
             p.second.pop();
-            if(connector == "&&")
-            {
-                And a(correctlyExecuted);
-                if(a.executeNext())
-                    correctlyExecuted = executeSingle(p.first.at(i));
-            }
-            else if(connector == "||")
-            {
-                Or o(correctlyExecuted);
-                if(o.executeNext())
-                    correctlyExecuted = executeSingle(p.first.at(i));
-            }
+
+            if(connector == "&&" && correctlyExecuted)
+                correctlyExecuted = executeSingle(p.first.at(i));
+            else if(connector == "||" && !correctlyExecuted)
+                correctlyExecuted = executeSingle(p.first.at(i));
             else if(connector == ";")
-            {
-                Semicolon semicolon(correctlyExecuted);
-                if(semicolon.executeNext())
-                    correctlyExecuted = executeSingle(p.first.at(i));
-            }
+                correctlyExecuted = executeSingle(p.first.at(i));
             
         }
     }
