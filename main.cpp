@@ -150,7 +150,11 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
 
         // Hash in beginning of word
         else if(*singleWord.begin() == '#')
+        {
             queueConnectors.push("#");
+            index++;
+            vecCommands.push_back(emptyVector);
+        }
         // Semicolons in word
         else if(singleWord.find(";") != std::string::npos)
             check(singleWord, ";", b, index, vecCommands, queueConnectors);
@@ -356,4 +360,3 @@ void check(std::string singleWord, std::string keyword, bool& b, int& index,
         v.at(index).push_back(backWord);
     }
 }
-
