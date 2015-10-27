@@ -153,23 +153,31 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
             index++;
             vecCommands.push_back(emptyVector);
         }
-
+        
         else if(*singleWord.begin() == '\"')
         {
-            std::string test = singleWord.substr(1, singleWord.size() - 1);
-
-            do
+            if(*singleWord.rbegin() == '\"')
             {
-                iSS >> singleWord;
-                if(*singleWord.rbegin() == '\"')
+                vecCommands.at(index).push_back
+                    (singleWord.substr(1, singleWord.size() - 2));
+            }
+            else
+            {
+                std::string test = singleWord.substr(1, singleWord.size() - 1);
+                do
                 {
-                    test += " " + singleWord.substr(0, singleWord.size() - 1);
-                    vecCommands.at(index).push_back(test);
-                }
-                else
-                    test += " " + singleWord;
-
-            } while(*singleWord.rbegin() != '\"' || iSS.good());
+                    iSS >> singleWord;
+                    if(*singleWord.rbegin() == '\"')
+                    {
+                        test += " " + singleWord.substr
+                            (0, singleWord.size() - 1);
+                        vecCommands.at(index).push_back(test);
+                        break;
+                    }
+                    else
+                        test += " " + singleWord;
+                } while(*singleWord.rbegin() != '\"' && iSS.good());
+            }
         }
 
         // Hash in beginning of word
