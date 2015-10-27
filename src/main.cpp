@@ -119,6 +119,7 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
 
     std::queue<std::string> queueConnectors;
     // Read from string until completely parsed
+    std::string test;
     std::istringstream iSS(s);
     do
     {
@@ -151,6 +152,24 @@ std::pair<std::vector<std::vector<std::string> >, std::queue<std::string> >
             // action will be taking place.
             index++;
             vecCommands.push_back(emptyVector);
+        }
+
+        else if(*singleWord.begin() == '\"')
+        {
+            std::string test = singleWord.substr(1, singleWord.size() - 1);
+
+            do
+            {
+                iSS >> singleWord;
+                if(*singleWord.rbegin() == '\"')
+                {
+                    test += " " + singleWord.substr(0, singleWord.size() - 1);
+                    vecCommands.at(index).push_back(test);
+                }
+                else
+                    test += " " + singleWord;
+
+            } while(*singleWord.rbegin() != '\"' || iSS.good());
         }
 
         // Hash in beginning of word
