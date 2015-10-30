@@ -21,6 +21,7 @@ class Parse
         static std::queue<std::string> parseCommand(std::string s);
         static std::queue<std::string> parseConnector(std::string s, bool &b);
         static std::vector<std::string> prepareVector(std::string s);
+        static bool errorLeadingConnector(std::string s);
 };
 
 #endif

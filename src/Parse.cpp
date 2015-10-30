@@ -22,17 +22,50 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
     std::queue<std::string> que;
 
     t_tokenizer tok(s, c);
+    // if tokenizer is empty, there is queue is empty
+    if(tok.begin() == tok.end())
+        return que;
+    // set string f to first token value for error checking
+    std::string f = *tok.begin();
+
     for(t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
     {
-        if(*beg != ";" && *beg != "&&" && *beg != "||")
+        // if token is a valid token, push into queue
+        if(*beg == ";" || *beg == "&&" || *beg == "||")
+        {
+            que.push(*beg);
+        }
+        
+        //error if not &&, || or ;
+        else if((f == "|" || f == "&"
+    || (f.size() > 1 && f.at(0) == ';' && f.at(1) == ';')
+    || (f.size() > 1 && f.at(0) == '&' && f.at(1) != '&')
+    || (f.size() > 1 && f.at(0) == '|' && f.at(1) != '|')
+    || (f.size() > 2 && f.at(0) == '&' && f.at(1) == '&' && f.at(2) == '&')
+    || (f.size() > 2 && f.at(0) == '|' && f.at(1) == '|' && f.at(2) == '|')))
         {
             b = true;
             return que;
         }
-        que.push(*beg);
+
+        //continue with misc characters
     }
     return que;
 }
+
+// Return true if leading connector is present
+bool Parse::errorLeadingConnector(std::string s)
+{
+    cs c(" ");
+    t_tokenizer tok(s, c);
+    t_tokenizer::iterator beg = tok.begin();
+
+    if(*beg == "&&" || *beg == "||" || *beg == ";")
+        return true;
+
+    return false;
+}
+    
 
 std::queue<std::string> Parse::parseCommand(std::string s)
 {
@@ -102,12 +135,20 @@ void Parse::parseQuotes(std::vector<std::string>& v)
                                 (stringCounter, v.at(i).size() - stringCounter));
                         v.at(i) = v.at(i).substr(0, stringCounter);
                     }
-                // else?
                 }
                 // When right and left quotations are not on the same vec index
                 else if(i != stackPairs.top().first)
                 {
                     v.at(i).erase(v.at(i).begin() + stringCounter);
+
+                    // if there are ending terms, separate into bot vec
+                    if(stringCounter != v.at(i).size())
+                    {
+                        v.insert(v.begin() + i + 1, v.at(i).substr
+                                (stringCounter, v.at(i).size() - stringCounter));
+                        v.at(i) = v.at(i).substr(0, stringCounter);
+                    }
+
                     unsigned currIndex = i;
                     while(currIndex != stackPairs.top().first)
                     {

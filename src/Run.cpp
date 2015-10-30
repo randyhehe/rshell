@@ -138,6 +138,12 @@ void Run::start(std::string userInput)
         std::cout << "Error: Invalid Syntax." << std::endl;
         return;
     }
+
+    if(Parse::errorLeadingConnector(userInput))
+    {
+        std::cout << "Error: Invalid Syntax." << std::endl;
+        return;
+    }
     
     //start test here
     std::queue<std::string> qNigga = qCommands;
