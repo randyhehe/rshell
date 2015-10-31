@@ -145,26 +145,5 @@ void Run::start(std::string userInput)
         return;
     }
     
-    //start test here
-    std::queue<std::string> qNigga = qCommands;
-    while(!qNigga.empty())
-    {
-        std::cout << qNigga.front() <<  std::endl;
-        qNigga.pop();
-    }
-    std::cout << "--------------------" << std::endl;
-
-    while(!qConnectors.empty())
-    {
-        std::cout << qConnectors.front() << std::endl;
-        qConnectors.pop();
-    }
-    std::cout << "------------------------" << std::endl;
-
-    std::vector<std::string> yolo = Parse::prepareVector(qCommands.front());
-    for(unsigned i = 0; i < yolo.size(); i++)
-        std::cout << yolo.at(i) << std::endl;
-     //end test there
-
-    //executeAll(qCommands, qConnectors);
+    executeAll(qCommands, qConnectors);
 }
