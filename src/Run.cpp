@@ -97,6 +97,9 @@ bool Run::errorOnLeadingConnector(std::string userInput)
     
     std::string::iterator it = front.begin();
 
+    if(it == front.end())
+        return false;
+
     if(userInput.size() == 1 && *it == ';')
     {
         return true;
@@ -130,7 +133,8 @@ void Run::start(std::string userInput)
     }
 
     std::queue<std::string> qCommands = Parse::parseCommand(userInput);
-
+    
+    // check for errors when parsing connector
     bool err = false;
     std::queue<std::string> qConnectors = Parse::parseConnector(userInput, err);
     if(err)
@@ -139,6 +143,7 @@ void Run::start(std::string userInput)
         return;
     }
 
+    // check for errors for leading connector
     if(Parse::errorLeadingConnector(userInput))
     {
         std::cout << "Error: Invalid Syntax." << std::endl;
@@ -146,4 +151,5 @@ void Run::start(std::string userInput)
     }
     
     executeAll(qCommands, qConnectors);
+    return;
 }

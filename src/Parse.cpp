@@ -22,11 +22,6 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
     std::queue<std::string> que;
 
     t_tokenizer tok(s, c);
-    // if tokenizer is empty, there is queue is empty
-    //if (tok.begin() == tok.end())
-    //    return que;
-    // set string f to first token value for error checking
-    //istd::string f = *tok.begin();
 
     for (t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
     {
@@ -42,14 +37,11 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
         else if ((f == "|" || f == "&" || f.size() > 2
     || (f.size() > 1 && f.at(0) == ';' && f.at(1) == ';')
     || (f.size() > 1 && f.at(0) == '&' && f.at(1) != '&')
-    || (f.size() > 1 && f.at(0) == '|' && f.at(1) != '|')
-    || (f.size() > 2 && f.at(0) == '&' && f.at(1) == '&' && f.at(2) == '&')
-    || (f.size() > 2 && f.at(0) == '|' && f.at(1) == '|' && f.at(2) == '|')))
+    || (f.size() > 1 && f.at(0) == '|' && f.at(1) != '|')))
         {
             b = true;
             return que;
         }
-        //continue with misc characters
     }
     return que;
 }
@@ -57,11 +49,17 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
 // Return true if leading connector is present
 bool Parse::errorLeadingConnector(std::string s)
 {
+    // Tokenizer for spaces
     cs c(" ");
     t_tokenizer tok(s, c);
     t_tokenizer::iterator beg = tok.begin();
+    
+    // Do not try to get values from tokenizer if it is empty.
+    if (tok.begin() == tok.end())
+        return false;
 
-    if (*beg == "&&" || *beg == "||" || *beg == ";")
+    // If the first thing entered was a connector, return true.
+    else if (*beg == "&&" || *beg == "||" || *beg == ";")
         return true;
 
     return false;
