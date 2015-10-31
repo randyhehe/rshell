@@ -14,13 +14,13 @@ class Parse
                 boost::char_separator<char> sep);
         static std::vector<std::string> parseSpaces(std::string s);
         static std::vector<std::string> splitHash
-            (const std::vector<std::string>& v);
+            (const std::vector<std::string>& v, bool& b);
         static void parseQuotes(std::vector<std::string>& v);
 
     public:
         static std::queue<std::string> parseCommand(std::string s);
         static std::queue<std::string> parseConnector(std::string s, bool &b);
-        static std::vector<std::string> prepareVector(std::string s);
+        static std::vector<std::string> prepareVector(std::string s, bool &b);
         static bool errorLeadingConnector(std::string s);
 };
 

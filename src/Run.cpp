@@ -50,32 +50,47 @@ void Run::executeAll(std::queue<std::string>& qCmd,
 {
     if(qCmd.empty())
         return;
-
-    std::vector<std::string> splitParams = Parse::prepareVector(qCmd.front()); 
+    
+    // hasHash = true if there is a comment in the current preparedVector 
+    bool hasHash = false;
+    std::vector<std::string> splitParams = Parse::prepareVector
+        (qCmd.front(), hasHash);
 
     bool correctlyExecuted = executeSingle(splitParams);
+
+    if(hasHash)
+        return;
+
     qCmd.pop();
     
     while (!qCmd.empty())
     {
-        splitParams = Parse::prepareVector(qCmd.front());
+        splitParams = Parse::prepareVector(qCmd.front(), hasHash);
         if (qCnct.front() == "&&")
         {
             And a(correctlyExecuted);
             if(a.executeNext())
-                correctlyExecuted = executeSingle(splitParams);
+            {
+                correctlyExecuted = executeSingle(splitParams);}
+                if(hasHash) return;
         }
         else if (qCnct.front() == "||")
         {
             Or o(correctlyExecuted);
             if(o.executeNext())
+            {
                 correctlyExecuted = executeSingle(splitParams);
+                if(hasHash) return;
+            }
         }
         else if (qCnct.front() == ";")
         {
             Semicolon sc(correctlyExecuted);
             if (sc.executeNext())
+            {
                 correctlyExecuted = executeSingle(splitParams);
+                if(hasHash) return;
+            }
         }
         qCnct.pop();
         qCmd.pop();

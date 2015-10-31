@@ -164,7 +164,9 @@ void Parse::parseQuotes(std::vector<std::string>& v)
     } 
 }
 
-std::vector<std::string> Parse::splitHash(const std::vector<std::string>& v)
+
+std::vector<std::string> Parse::splitHash(const std::vector<std::string>& v,
+        bool& b)
 {
     std::vector<std::string> vec;
 
@@ -177,16 +179,17 @@ std::vector<std::string> Parse::splitHash(const std::vector<std::string>& v)
         if (*(v.at(i).begin()) == '#')
         {
             vec.pop_back();
+            b = true;    // set boolean to true if comment is present
             return vec;
         }
     }
     return vec;
 }
 
-std::vector<std::string> Parse::prepareVector(std::string s)
+std::vector<std::string> Parse::prepareVector(std::string s, bool& b)
 {
     std::vector<std::string> retVec = parseSpaces(s);
-    retVec = splitHash(retVec);
+    retVec = splitHash(retVec, b);
     parseQuotes(retVec);
 
     return retVec;
