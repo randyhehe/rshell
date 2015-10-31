@@ -34,10 +34,12 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
         }
         
         //error if not &&, || or ;
-        else if ((f == "|" || f == "&" || f.size() > 2
+        else if ((f == "|" || f == "&" //|| f.size() > 2
     || (f.size() > 1 && f.at(0) == ';' && f.at(1) == ';')
     || (f.size() > 1 && f.at(0) == '&' && f.at(1) != '&')
-    || (f.size() > 1 && f.at(0) == '|' && f.at(1) != '|')))
+    || (f.size() > 1 && f.at(0) == '|' && f.at(1) != '|')
+    || (f.size() > 2 && f.at(0) == '&' && f.at(2) == '&')
+    || (f.size() > 2 && f.at(0) == '|' && f.at(2) == '|')))
         {
             b = true;
             return que;
