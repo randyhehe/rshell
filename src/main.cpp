@@ -9,14 +9,14 @@ int main()
 {
     Run run;
 
-    for(;;)
+    for (;;)
     {
         printUser();
 
         std::string userInput;
         std::getline(std::cin, userInput);
 
-        if(userInput == "exit")
+        if (userInput == "exit")
             return 0;
 
         run.start(userInput);
@@ -29,7 +29,7 @@ void printUser()
 {
     char hostname[HOST_NAME_MAX];
     int status = gethostname(hostname, HOST_NAME_MAX);
-    if(status != 0)
+    if (status != 0)
     {
         perror("gethostname failed");
         exit(errno);
@@ -37,7 +37,7 @@ void printUser()
 
     struct passwd *pws;
     pws = getpwuid(geteuid());
-    if(pws == NULL)
+    if (pws == NULL)
     {
         perror("getid failed");
         exit(errno);

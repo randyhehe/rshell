@@ -9,7 +9,7 @@ std::queue<std::string> Parse::parseHelper(std::string s,
     std::queue<std::string> que;
     
     t_tokenizer tok(s, sep);
-    for(t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
+    for (t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
         que.push(*beg);
 
     return que;
@@ -23,21 +23,23 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
 
     t_tokenizer tok(s, c);
     // if tokenizer is empty, there is queue is empty
-    if(tok.begin() == tok.end())
-        return que;
+    //if (tok.begin() == tok.end())
+    //    return que;
     // set string f to first token value for error checking
-    std::string f = *tok.begin();
+    //istd::string f = *tok.begin();
 
-    for(t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
+    for (t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
     {
+        std::string f = *beg;
+
         // if token is a valid token, push into queue
-        if(*beg == ";" || *beg == "&&" || *beg == "||")
+        if (*beg == ";" || *beg == "&&" || *beg == "||")
         {
             que.push(*beg);
         }
         
         //error if not &&, || or ;
-        else if((f == "|" || f == "&"
+        else if ((f == "|" || f == "&" || f.size() > 2
     || (f.size() > 1 && f.at(0) == ';' && f.at(1) == ';')
     || (f.size() > 1 && f.at(0) == '&' && f.at(1) != '&')
     || (f.size() > 1 && f.at(0) == '|' && f.at(1) != '|')
@@ -47,7 +49,6 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
             b = true;
             return que;
         }
-
         //continue with misc characters
     }
     return que;
@@ -60,7 +61,7 @@ bool Parse::errorLeadingConnector(std::string s)
     t_tokenizer tok(s, c);
     t_tokenizer::iterator beg = tok.begin();
 
-    if(*beg == "&&" || *beg == "||" || *beg == ";")
+    if (*beg == "&&" || *beg == "||" || *beg == ";")
         return true;
 
     return false;
@@ -82,7 +83,7 @@ std::vector<std::string> Parse::parseSpaces(std::string s)
     std::vector<std::string> vec;
 
     t_tokenizer tok(s, sep);
-    for(t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
+    for (t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
         vec.push_back(*beg);
 
     return vec;
@@ -93,20 +94,19 @@ void Parse::parseQuotes(std::vector<std::string>& v)
     // iterate through whole vector
     std::stack<std::pair<unsigned, unsigned> > stackPairs;
 
-    for(unsigned i = 0; i < v.size(); i++)
+    for (unsigned i = 0; i < v.size(); i++)
     {
         //if current string at v.at(i) finds a quotation mark
-        while(v.at(i).find("\"") != std::string::npos)
+        while (v.at(i).find("\"") != std::string::npos)
         {
             unsigned stringCounter = v.at(i).find("\"");
 
             // if stack pairs is empty, this means it is the left quote
-            if(stackPairs.empty())
+            if (stackPairs.empty())
             {
                 //index of vector into first and index of string at second
                 stackPairs.push(std::make_pair(i, stringCounter));
                 v.at(i).erase(v.at(i).begin() + stringCounter);
-                // in cases like " hey " then " will become empty. Should i fix?
 
                 // if there is text before the left quote, we need to separate
                 if(stackPairs.top().second > 0)
@@ -122,35 +122,35 @@ void Parse::parseQuotes(std::vector<std::string>& v)
             else
             {
                 // If right and left quotations are on the same vector index
-                if(i == stackPairs.top().first)
+                if (i == stackPairs.top().first)
                 {
 
                     v.at(i).erase(v.at(i).begin() + stringCounter);
                     stackPairs.pop();
                     
                     // If there are still leading terms, separate into bot vec
-                    if(stringCounter != v.at(i).size())
+                    if (stringCounter != v.at(i).size())
                     {
                         v.insert(v.begin() + i + 1, v.at(i).substr
-                                (stringCounter, v.at(i).size() - stringCounter));
+                            (stringCounter, v.at(i).size() - stringCounter));
                         v.at(i) = v.at(i).substr(0, stringCounter);
                     }
                 }
                 // When right and left quotations are not on the same vec index
-                else if(i != stackPairs.top().first)
+                else if (i != stackPairs.top().first)
                 {
                     v.at(i).erase(v.at(i).begin() + stringCounter);
 
                     // if there are ending terms, separate into bot vec
-                    if(stringCounter != v.at(i).size())
+                    if (stringCounter != v.at(i).size())
                     {
                         v.insert(v.begin() + i + 1, v.at(i).substr
-                                (stringCounter, v.at(i).size() - stringCounter));
+                            (stringCounter, v.at(i).size() - stringCounter));
                         v.at(i) = v.at(i).substr(0, stringCounter);
                     }
 
                     unsigned currIndex = i;
-                    while(currIndex != stackPairs.top().first)
+                    while (currIndex != stackPairs.top().first)
                     {
                         v.at(currIndex - 1) = v.at(currIndex - 1) + " "
                             + v.at(currIndex);
@@ -170,13 +170,13 @@ std::vector<std::string> Parse::splitHash(const std::vector<std::string>& v)
 {
     std::vector<std::string> vec;
 
-    for(unsigned i = 0; i < v.size(); i++)
+    for (unsigned i = 0; i < v.size(); i++)
     {
         vec.push_back(v.at(i));
 
         // If the word is either by itself or has its first letter as #,
         // return the vec before adding in the rest of the elements in v.
-        if(*(v.at(i).begin()) == '#')
+        if (*(v.at(i).begin()) == '#')
         {
             vec.pop_back();
             return vec;
