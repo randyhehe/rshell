@@ -11,7 +11,7 @@ This program is intended to behave like a linux shell. Coded in C++ for Universi
 * Supports use of quotes to combine multiple words into a single parameter.
 
 #### Bugs/Limitations
-* Leading or trailing characters next to quotes will have a spaces appended when using echo. For example. echo hello"world" will print hello world instead of helloworld.
+* Leading or trailing characters next to quotes will have a space appended when using echo. For example. echo hello"world" will print hello world instead of helloworld.
 * Putting connectors inside of quotes will still yield a syntax error.
 * Ctrl-D will crash program.
 
