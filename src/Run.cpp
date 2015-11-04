@@ -45,42 +45,57 @@ bool Run::executeSingle(std::vector<std::string>& v)
     return false;
 }
 
-void Run::executeAll(std::queue<std::string>& qCmd, 
+// Function attempts to execute all commands.
+// If "exit" is found, return false.
+// Return true if no exit is found.
+bool Run::executeAll(std::queue<std::string>& qCmd, 
         std::queue<std::string>& qCnct)
 {
     if(qCmd.empty())
-        return;
-    
+        return true;
+
     // hasHash = true if there is a comment in the current preparedVector 
     bool hasHash = false;
     std::vector<std::string> splitParams = Parse::prepareVector
         (qCmd.front(), hasHash);
 
+    if(splitParams.at(0) == "exit")
+        return false;
+
     bool correctlyExecuted = executeSingle(splitParams);
 
     if(hasHash)
-        return;
+        return true;
 
     qCmd.pop();
     
     while (!qCmd.empty())
     {
         splitParams = Parse::prepareVector(qCmd.front(), hasHash);
+
         if (qCnct.front() == "&&")
         {
             And a(correctlyExecuted);
             if(a.executeNext())
             {
+                if(splitParams.at(0) == "exit")
+                    return false;
+
                 correctlyExecuted = executeSingle(splitParams);}
-                if(hasHash) return;
+                if(hasHash) 
+                    return true;
         }
         else if (qCnct.front() == "||")
         {
             Or o(correctlyExecuted);
             if(o.executeNext())
             {
+                if(splitParams.at(0) == "exit")
+                    return false;
+
                 correctlyExecuted = executeSingle(splitParams);
-                if(hasHash) return;
+                if(hasHash) 
+                    return true;
             }
         }
         else if (qCnct.front() == ";")
@@ -88,13 +103,18 @@ void Run::executeAll(std::queue<std::string>& qCmd,
             Semicolon sc(correctlyExecuted);
             if (sc.executeNext())
             {
+                if(splitParams.at(0) == "exit")
+                    return false;
+
                 correctlyExecuted = executeSingle(splitParams);
-                if(hasHash) return;
+                if(hasHash) 
+                    return true;
             }
         }
         qCnct.pop();
         qCmd.pop();
     }
+    return true;
 }
 
 // false for no error
@@ -138,13 +158,15 @@ bool Run::errorOnLeadingConnector(std::string userInput)
     return false;
 }
 
-void Run::start(std::string userInput)
+// Starts the program. Returns true if no exit is found.
+// Returns false is exit is found in executeAll function.
+bool Run::start(std::string userInput)
 {
     //check for leading
     if(errorOnLeadingConnector(userInput))
     {
         std::cout << "Error: Invalid Syntax." << std::endl;
-        return;
+        return true;
     }
 
     std::queue<std::string> qCommands = Parse::parseCommand(userInput);
@@ -155,16 +177,19 @@ void Run::start(std::string userInput)
     if(err)
     {
         std::cout << "Error: Invalid Syntax." << std::endl;
-        return;
+        return true;
     }
 
     // check for errors for leading connector
     if(Parse::errorLeadingConnector(userInput))
     {
         std::cout << "Error: Invalid Syntax." << std::endl;
-        return;
+        return true;
     }
     
-    executeAll(qCommands, qConnectors);
-    return;
+    bool isExit = executeAll(qCommands, qConnectors);
+    if (!isExit)
+        return false;
+
+    return true;
 }

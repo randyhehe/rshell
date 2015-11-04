@@ -63,6 +63,17 @@ bool Parse::errorLeadingConnector(std::string s)
     // If the first thing entered was a connector, return true.
     else if (*beg == "&&" || *beg == "||" || *beg == ";")
         return true;
+    
+    else if((*beg).size() > 2)
+    {
+        if((*beg).substr(0, 2) == "&&" || (*beg).substr(0, 2) == "||")
+            return true;
+    }
+    if((*beg).size() > 1)
+    {
+        if((*beg).substr(0, 1) == ";")
+            return true;
+    }
 
     return false;
 }

@@ -26,12 +26,12 @@ class Run
     private:
         std::vector<char*> toCharPointers(std::vector<std::string> &v);
         bool executeSingle(std::vector<std::string>& v);
-        void executeAll(std::queue<std::string>& qCmd, 
+        bool executeAll(std::queue<std::string>& qCmd, 
                 std::queue<std::string>& qCnct);
         bool errorOnLeadingConnector(std::string s);
 
     public:
-        void start(std::string userInput);
+        bool start(std::string userInput);
 };
 
 #endif

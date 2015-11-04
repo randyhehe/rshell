@@ -16,10 +16,9 @@ int main()
         std::string userInput;
         std::getline(std::cin, userInput);
 
-        if (userInput == "exit")
+        bool b = run.start(userInput);
+        if(!b)
             return 0;
-
-        run.start(userInput);
     }
 
     return 0;
