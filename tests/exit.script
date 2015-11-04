@@ -1,0 +1,39 @@
+Script started on Tue 03 Nov 2015 11:47:32 PM PST
+]0;rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ make
+]0;makerm -rfv bin
+removed ‘bin/rshell’
+removed directory: ‘bin’
+mkdir -p bin
+g++ -Wall -Werror -ansi -pedantic -I boost_1_59_0 src/main.cpp src/Connector.cpp src/Or.cpp src/And.cpp src/Semicolon.cpp src/Run.cpp src/Parse.cpp -o bin/rshell
+]0;rshell: makerandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+]0;bin/rshellrandyhe@Y510P$ exit
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell[6Pmakebin/rshell
+]0;bin/rshellrandyhe@Y510P$ exz it && echo hi
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+]0;bin/rshellrandyhe@Y510P$ ech  xit blah blah blah
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+]0;bin/rshellrandyhe@Y510P$ exit && echo no
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+]0;bin/rshellrandyhe@Y510P$ exit || ex          ; exit      exit    echo yes        true && ec xit
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+]0;bin/rshellrandyhe@Y510P$ true || exit
+randyhe@Y510P$ true ||             exit && e   echo "hi"
+hi
+randyhe@Y510P$ e echo hey #exit
+hey
+randyhe@Y510P$ exit
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+]0;bin/rshellrandyhe@Y510P$ exit    echo hey && echo n hi || ex xit
+hey
+hi
+randyhe@Y510P$ ^[[A    echo exit ||   exit
+exit
+randyhe@Y510P$ exit    xit
+execvp failed: No such file or directory
+randyhe@Y510P$ eeeexit
+execvp failed: No such file or directory
+randyhe@Y510P$ exit
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ exit
+]0;exitexit
+
+Script done on Tue 03 Nov 2015 11:49:51 PM PST

@@ -1,0 +1,37 @@
+Script started on Tue 03 Nov 2015 06:13:47 PM PST
+]0;rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ make[K[K[K[Kbin/rshell[K[K[K[K[K[K[K[K[K[Kmake
+]0;makerm -rfv bin
+removed ‘bin/rshell’
+removed directory: ‘bin’
+mkdir -p bin
+g++ -Wall -Werror -ansi -pedantic -I boost_1_59_0 src/main.cpp src/Connector.cpp src/Or.cpp src/And.cpp src/Semicolon.cpp src/Run.cpp src/Parse.cpp -o bin/rshell
+]0;rshell: makerandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+]0;bin/rshellrandyhe@Y510P$ echo hey # #     # hey
+
+randyhe@Y510P$ echo #hey
+
+randyhe@Y510P$ echo commentsinsidewords                   hashtagsinc sidewordsarenotcomments!^[[D                               s#inside#words#are#not#comments!
+hashtags#inside#words#are#not#comments!
+randyhe@Y510P$ echo neitherif              e echo # h works by itself
+
+randyhe@Y510P$ echo #worls  ks if front         n front of      T t!
+
+randyhe@Y510P$ echo # hello #  # echo           hashtags        hashtags#don    #behind#words#are#not#coment  me   ments#either && echo hey
+hashtags#behind#words#are#not#comments#either
+hey
+randyhe@Y510P$ echo ha  hey# e && echo world
+hey#
+world
+randyhe@Y510P$ echo hey     # hey &&e  echo testing with multip           commenting with multiple commands
+
+randyhe@Y510P$ echo #hey && s echo should not i output
+
+randyhe@Y510P$ ls #wh  i like      -a -l
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+randyhe@Y510P$ ls -a #-l
+.  ..  bin  boost_1_59_0  .git	LICENSE  Makefile  README.md  src  tests  typescript
+randyhe@Y510P$ exit
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ exit
+]0;exitexit
+
+Script done on Tue 03 Nov 2015 06:16:26 PM PST

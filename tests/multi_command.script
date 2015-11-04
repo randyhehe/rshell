@@ -1,0 +1,93 @@
+Script started on Tue 03 Nov 2015 06:03:57 PM PST
+]0;rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ make
+]0;makerm -rfv bin
+mkdir -p bin
+g++ -Wall -Werror -ansi -pedantic -I boost_1_59_0 src/main.cpp src/Connector.cpp src/Or.cpp src/And.cpp src/Semicolon.cpp src/Run.cpp src/Parse.cpp -o bin/rshell
+]0;rshell: makerandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ cd bin[K[K[K[K[K[Kbin/rshell
+]0;bin/rshellrandyhe@Y510P$ echo    ls;   ; ls; pwd;
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+/home/randyhe/Documents/FALL2015/CS100/rshell
+randyhe@Y510P$ ls; pwd
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+/home/randyhe/Documents/FALL2015/CS100/rshell
+randyhe@Y510P$ ls ;pwd
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+/home/randyhe/Documents/FALL2015/CS100/rshell
+randyhe@Y510P$ ls;pwd
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+/home/randyhe/Documents/FALL2015/CS100/rshell
+randyhe@Y510P$ ls        ; pdf  wd
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+/home/randyhe/Documents/FALL2015/CS100/rshell
+randyhe@Y510P$ ls            ; pwd ;
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+/home/randyhe/Documents/FALL2015/CS100/rshell
+randyhe@Y510P$ ls && pwd   pwd
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+/home/randyhe/Documents/FALL2015/CS100/rshell
+randyhe@Y510P$ ec  badinput && pwd   ls
+execvp failed: No such file or directory
+randyhe@Y510P$ bad i  input &&     ut&& ls
+execvp failed: No such file or directory
+randyhe@Y510P$ badinput &&ls
+execvp failed: No such file or directory
+randyhe@Y510P$ true && ls
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+randyhe@Y510P$ true &      echo hello && echo word ld
+hello
+world
+randyhe@Y510P$ echo hello           &&echo world
+hello
+world
+randyhe@Y510P$ echo hello&&echo world
+hello
+world
+randyhe@Y510P$ echo hello  ||echo    echo world
+hello
+randyhe@Y510P$ echo hello  || echo world
+hello
+randyhe@Y510P$ echo hello ||echo world
+hello
+randyhe@Y510P$ echo hello            || echo world
+hello
+randyhe@Y510P$ echo hello &&& echo world
+Error: Invalid Syntax.
+randyhe@Y510P$ echo hello &&&&&& eco   h o  o wrold    orld
+Error: Invalid Syntax.
+randyhe@Y510P$ echo hello ||||||| echo world
+Error: Invalid Syntax.
+randyhe@Y510P$ echo hello | w echo world
+Error: Invalid Syntax.
+randyhe@Y510P$ echo hello & echo world
+Error: Invalid Syntax.
+randyhe@Y510P$ ech   & e  & echo hello
+Error: Invalid Syntax.
+randyhe@Y510P$ || echo hello
+Error: Invalid Syntax.
+randyhe@Y510P$ ; echo hello
+Error: Invalid Syntax.
+randyhe@Y510P$ ;;;; echo hello
+Error: Invalid Syntax.
+randyhe@Y510P$ &&& echo hello
+Error: Invalid Syntax.
+randyhe@Y510P$ ||| echo hello
+Error: Invalid Syntax.
+randyhe@Y510P$ echo    hello          &&&  echo              echo hello
+hello
+hello
+randyhe@Y510P$ echo hey; echo i; echo like  ; ucr;    echo ucr;
+hey
+i
+like
+ucr
+randyhe@Y510P$ echo hey && echo no || echo why at
+hey
+no
+randyhe@Y510P$ true      echo    false && false || echo hey
+hey
+randyhe@Y510P$ false     true && tre   ue |\ | echo nothing
+randyhe@Y510P$ exit
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ exit
+]0;exitexit
+
+Script done on Tue 03 Nov 2015 06:07:48 PM PST

@@ -1,0 +1,42 @@
+Script started on Tue 03 Nov 2015 06:11:12 PM PST
+]0;rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ make
+]0;makerm -rfv bin
+removed ‘bin/rshell’
+removed directory: ‘bin’
+mkdir -p bin
+g++ -Wall -Werror -ansi -pedantic -I boost_1_59_0 src/main.cpp src/Connector.cpp src/Or.cpp src/And.cpp src/Semicolon.cpp src/Run.cpp src/Parse.cpp -o bin/rshell
+]0;rshell: makerandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+]0;bin/rshellrandyhe@Y510P$ echo test    "testing        testing one lin               hi
+hi
+randyhe@Y510P$ echo                testing whitespace
+testing whitespace
+randyhe@Y510P$ echo                                                 thats a lot of whitespaces!                       's a lot of q hi w  whie tespaces!
+that's a lot of whitespaces!
+randyhe@Y510P$ mkdir testDirectory
+randyhe@Y510P$ ls
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  testDirectory  tests  typescript
+randyhe@Y510P$ rm -r testDirectory
+randyhe@Y510P$ ls
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+randyhe@Y510P$ date
+Tue Nov  3 18:12:02 PST 2015
+randyhe@Y510P$ pwd
+/home/randyhe/Documents/FALL2015/CS100/rshell
+randyhe@Y510P$ echo  Succes       "This is all in on                 Eve erything in quotes in s one argument!"
+Everything in quotes is one argument!
+randyhe@Y510P$ echo "Hello" "World" T "Three Arguments               !!!"
+Hello World !!!
+randyhe@Y510P$ e cal
+   November 2015      
+Su Mo Tu We Th Fr Sa  
+ 1  2 [7m 3[27m  4  5  6  7  
+ 8  9 10 11 12 13 14  
+15 16 17 18 19 20 21  
+22 23 24 25 26 27 28  
+29 30                 
+                      
+randyhe@Y510P$ eix  xit
+]0;rshell: bin/rshellrandyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ exit
+]0;exitexit
+
+Script done on Tue 03 Nov 2015 06:12:45 PM PST
