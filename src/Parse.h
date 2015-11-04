@@ -7,6 +7,7 @@
 #include <utility>
 #include <stack>
 
+// Helps parse user data to correctly fit the logic of a typical linux shell.
 class Parse
 {
     private:

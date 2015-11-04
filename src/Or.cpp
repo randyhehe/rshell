@@ -6,7 +6,7 @@ Or::Or(bool b)
 
 bool Or::executeNext()
 {
-    if(getPrevious())
+    if (getPrevious())
         return false;
 
     return true;

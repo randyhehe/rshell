@@ -3,6 +3,7 @@
 typedef boost::tokenizer<boost::char_separator<char> > t_tokenizer;
 typedef boost::char_separator<char> cs;
 
+// Function used to help other functions parse with tokenizer
 std::queue<std::string> Parse::parseHelper(std::string s, 
         boost::char_separator<char> sep)
 {
@@ -15,6 +16,7 @@ std::queue<std::string> Parse::parseHelper(std::string s,
     return que;
 }
 
+// Parses for connectors and returns a queue of connector strings
 std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
 {
     cs c("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789#\" ");
@@ -48,7 +50,7 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
     return que;
 }
 
-// Return true if leading connector is present
+// Returns true if a leading connector is present
 bool Parse::errorLeadingConnector(std::string s)
 {
     // Tokenizer for spaces
@@ -64,21 +66,23 @@ bool Parse::errorLeadingConnector(std::string s)
     else if (*beg == "&&" || *beg == "||" || *beg == ";")
         return true;
     
-    else if((*beg).size() > 2)
+    // If first thing entered is a connector and connected to a word.
+    else if ((*beg).size() > 2)
     {
         if((*beg).substr(0, 2) == "&&" || (*beg).substr(0, 2) == "||")
             return true;
     }
-    if((*beg).size() > 1)
+    // If first thing entered is a connector and connnected to a word.
+    if ((*beg).size() > 1)
     {
-        if((*beg).substr(0, 1) == ";")
+        if ((*beg).substr(0, 1) == ";")
             return true;
     }
 
     return false;
 }
     
-
+// Parses for commands and returns a queue filled with string of commands.
 std::queue<std::string> Parse::parseCommand(std::string s)
 {
     cs sep(";&|");
@@ -87,6 +91,7 @@ std::queue<std::string> Parse::parseCommand(std::string s)
     return que;
 }
 
+// Parses for spaces and returns a queue filled with words separated by spaces.
 std::vector<std::string> Parse::parseSpaces(std::string s)
 {
     cs sep(" ");
@@ -100,6 +105,8 @@ std::vector<std::string> Parse::parseSpaces(std::string s)
     return vec;
 }
 
+// Function that deals with quotes. Helps keep arguments in quotes as one
+// parameter.
 void Parse::parseQuotes(std::vector<std::string>& v)
 {
     // iterate through whole vector
@@ -120,7 +127,7 @@ void Parse::parseQuotes(std::vector<std::string>& v)
                 v.at(i).erase(v.at(i).begin() + stringCounter);
 
                 // if there is text before the left quote, we need to separate
-                if(stackPairs.top().second > 0)
+                if (stackPairs.top().second > 0)
                 {
                     v.insert(v.begin() + i + 1, v.at(i).substr
                             (stringCounter, v.at(i).size() - stringCounter));
@@ -177,7 +184,7 @@ void Parse::parseQuotes(std::vector<std::string>& v)
     } 
 }
 
-
+// Helps parse for hashes.
 std::vector<std::string> Parse::splitHash(const std::vector<std::string>& v,
         bool& b)
 {
@@ -199,6 +206,8 @@ std::vector<std::string> Parse::splitHash(const std::vector<std::string>& v,
     return vec;
 }
 
+// Uses all other parse function in conjunction with each other to create a 
+// vector of strings ready to be used by run class.
 std::vector<std::string> Parse::prepareVector(std::string s, bool& b)
 {
     std::vector<std::string> retVec = parseSpaces(s);

@@ -6,7 +6,7 @@ And::And(bool b)
 
 bool And::executeNext()
 {
-    if(getPrevious())
+    if (getPrevious())
         return true;
 
     return false;
