@@ -8,6 +8,7 @@
 #include <utility>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <sys/wait.h>
 #include <errno.h>
@@ -29,6 +30,9 @@ class Run
         bool executeAll(std::queue<std::string>& qCmd, 
                 std::queue<std::string>& qCnct);
         bool errorOnLeadingConnector(std::string s);
+        bool runExec(std::vector<std::string>& v);
+        bool runStat(std::vector<std::string>& v);
+        char* stringToCharPtr(std::string s);
 
     public:
         bool start(std::string userInput);

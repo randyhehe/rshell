@@ -10,43 +10,190 @@ std::vector<char*> Run::toCharPointers(std::vector<std::string>& v)
     return c;
 }
 
-// Executes a single command of execvp given a vector of strings.
+// Execute a single command of execvp given a vector of strings.
 // Returns true if execution worked, otherwise return false.
-bool Run::executeSingle(std::vector<std::string>& v)
+bool Run::runExec(std::vector<std::string>& v)
 {
     std::vector<char*> vecChars = toCharPointers(v);
     vecChars.push_back(NULL);
     char** listCommands = &vecChars[0];
 
-    // Start execvp process
     int status;
     int exeVal;
     pid_t processID = fork();
-    if (processID < 0)
+    if(processID < 0)
     {
         perror("fork failed");
         exit(1);
     }
-    else if (processID == 0)
+    else if(processID == 0)
     {
         execvp(listCommands[0], listCommands);
         perror("execvp failed");
         exit(errno);
     }
-    else if ((processID = wait(&status)) < 0)
+    else if((processID = wait(&status)) < 0)
     {
-            perror("wait failed");
-            exit(1);
+        perror("wait failed");
+        exit(1);
     }
 
-    // Error check and return boolean value accordingly.
+    // Error check and return boolean value accordingly
+    if(WIFEXITED(status))
+        exeVal = WEXITSTATUS(status);
+
+    if(exeVal == 0)
+        return true;
+
+    return false;
+}
+
+char* Run::stringToCharPtr(std::string s)
+{
+    char* temp = &s.at(0);
+    return temp;
+}
+
+// Return 0 if the test succeeds and 1 if the test fails
+bool Run::runStat(std::vector<std::string>& v)
+{
+    bool file = false;
+    bool dir = false;
+    bool all = false;
+
+    if(v.begin() != v.end())
+        v.erase(v.begin());
+
+    if(v.begin() != v.end())
+    {
+        if(*v.begin() == "-f")
+        {   file = true;
+            v.erase(v.begin());
+        }
+
+        else if(*v.begin() == "-d")
+        {
+            dir = true;
+            v.erase(v.begin());
+        }
+        else if(*v.begin() == "-e")
+        {
+            all = true;
+            v.erase(v.begin());
+        }
+        else
+            all = true;
+    }
+
+    while(v.size() > 1)
+    {
+        if(v.at(1) == "]")
+        {
+            v.erase(v.begin() + 1);
+            break;
+        }
+        v.at(0) = v.at(0) + " " + v.at(1);
+        v.erase(v.begin() + 1);
+    }
+
+    char* input = stringToCharPtr(v.at(0));
+
+    int status;
+    int exeVal;
+    pid_t processID = fork();
+
+    if(processID < 0)
+    {
+        perror("fork failed");
+        exit(1);
+    }
+    else if(processID == 0)
+    {
+        struct stat fileStat;
+
+        if(stat(input, &fileStat) == -1)
+        {
+            perror("stat");
+            exit(EXIT_FAILURE);
+        }
+
+        // checks for regular file
+        if(file)
+        {
+            switch(fileStat.st_mode & S_IFMT)
+            {
+                case S_IFREG:
+                    return 0;
+                    break;
+                
+                default:
+                    return 1;
+                    break;
+            }
+        }
+    
+        // checks for directory
+        else if(dir)
+        {
+            switch(fileStat.st_mode & S_IFMT)
+            {
+                case S_IFDIR:
+                    return 0;
+                    break;
+                
+                default:
+                    return 1;
+                    break;
+            }
+        }
+    
+        // checks for either regular file or directory
+        else if(all)
+        {
+            switch(fileStat.st_mode & S_IFMT)
+            {
+                case S_IFREG:
+                    return 0;
+                    break;
+
+                case S_IFDIR:
+                    return 0;
+                    break;
+                
+                default:
+                    return 1;
+                    break;
+            }
+        }
+    }
+    else if((processID = wait(&status)) < 0)
+    {
+        perror("wait failed");
+        exit(1);
+    }
+
+    // Error check and return boolean value accordingly
     if (WIFEXITED(status))
         exeVal = WEXITSTATUS(status);
 
     if (exeVal == 0)
-        return true;
+        return 0;
 
-    return false;
+    return 1;
+}
+
+bool Run::executeSingle(std::vector<std::string>& v)
+{
+    // if first string is "test" then do stat instead of execvp
+    if(v.at(0) == "test" || v.at(0) == "[")
+        return !runStat(v);
+
+    //for(unsigned i = 0; i < v.size(); i++)
+    //    std::cout << v.at(i) << std::endl;
+
+    // Start execvp process
+    else
+        return runExec(v);
 }
 
 // Function attempts to execute all commands.
