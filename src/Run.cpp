@@ -61,8 +61,20 @@ bool Run::runStat(std::vector<std::string>& v)
     bool dir = false;
     bool all = false;
 
+    if(v.begin() != v.end() && *v.begin() == "[" && *(--v.end()) != "]")
+    {
+        std::cout << "Error: Invalid Syntax." << std::endl;
+        return 1;
+    }
+
     if(v.begin() != v.end())
         v.erase(v.begin());
+
+    if(v.begin() == v.end())
+    {
+        std::cout << "Error: Invalid Syntax." << std::endl;
+        return 1;
+    }
 
     if(v.begin() != v.end())
     {
@@ -187,9 +199,6 @@ bool Run::executeSingle(std::vector<std::string>& v)
     // if first string is "test" then do stat instead of execvp
     if(v.at(0) == "test" || v.at(0) == "[")
         return !runStat(v);
-
-    //for(unsigned i = 0; i < v.size(); i++)
-    //    std::cout << v.at(i) << std::endl;
 
     // Start execvp process
     else
