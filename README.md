@@ -1,3 +1,5 @@
+Randy He (rhe004@ucr.edu)
+
 # rshell
 #### Introduction
 This program is intended to behave like a linux shell. Coded in C++ for University of Riverside's Software Construction Class, CS100.
