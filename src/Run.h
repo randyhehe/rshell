@@ -15,6 +15,7 @@
 #include <limits.h>
 #include <pwd.h>
 #include <sstream>
+#include <signal.h>
 
 #include "And.h"
 #include "Connector.h"

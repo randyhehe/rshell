@@ -110,87 +110,62 @@ bool Run::runStat(std::vector<std::string>& v)
 
     char* input = stringToCharPtr(v.at(0));
 
-    int status;
-    int exeVal;
-    pid_t processID = fork();
+    struct stat fileStat;
 
-    if(processID < 0)
+    if(stat(input, &fileStat) == -1)
     {
-        perror("fork failed");
-        exit(1);
+        perror("stat");
+        exit(EXIT_FAILURE);
     }
-    else if(processID == 0)
+
+    // checks for regular file
+    if(file)
     {
-        struct stat fileStat;
-
-        if(stat(input, &fileStat) == -1)
+        switch(fileStat.st_mode & S_IFMT)
         {
-            perror("stat");
-            exit(EXIT_FAILURE);
-        }
-
-        // checks for regular file
-        if(file)
-        {
-            switch(fileStat.st_mode & S_IFMT)
-            {
-                case S_IFREG:
-                    return 0;
-                    break;
+            case S_IFREG:
+                return 0;
+                break;
                 
-                default:
-                    return 1;
-                    break;
-            }
+            default:
+                return 1;
+                break;
         }
+    }
     
         // checks for directory
-        else if(dir)
+    else if(dir)
+    {
+        switch(fileStat.st_mode & S_IFMT)
         {
-            switch(fileStat.st_mode & S_IFMT)
-            {
-                case S_IFDIR:
-                    return 0;
-                    break;
+            case S_IFDIR:
+                return 0;
+                break;
                 
-                default:
-                    return 1;
-                    break;
+            default:
+                return 1;
+                break;
             }
         }
     
-        // checks for either regular file or directory
-        else if(all)
+    // checks for either regular file or directory
+    else if(all)
+    {
+        switch(fileStat.st_mode & S_IFMT)
         {
-            switch(fileStat.st_mode & S_IFMT)
-            {
-                case S_IFREG:
-                    return 0;
-                    break;
+            case S_IFREG:
+                return 0;
+                break;
 
-                case S_IFDIR:
-                    return 0;
-                    break;
+            case S_IFDIR:
+                return 0;
+                break;
                 
-                default:
-                    return 1;
-                    break;
-            }
+            default:
+                return 1;
+                break;
         }
     }
-    else if((processID = wait(&status)) < 0)
-    {
-        perror("wait failed");
-        exit(1);
-    }
-
-    // Error check and return boolean value accordingly
-    if (WIFEXITED(status))
-        exeVal = WEXITSTATUS(status);
-
-    if (exeVal == 0)
-        return 0;
-
     return 1;
 }
 

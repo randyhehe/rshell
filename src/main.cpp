@@ -17,6 +17,7 @@ int main()
         std::getline(std::cin, userInput);
 
         bool b = run.start(userInput);
+
         if(!b)
             return 0;
     }
