@@ -34,6 +34,7 @@ class Run
         bool runExec(std::vector<std::string>& v);
         bool runStat(std::vector<std::string>& v);
         char* stringToCharPtr(std::string s);
+        bool singleCommandInParen(std::vector<std::string>& splitCommands);
 
     public:
         bool start(std::string userInput);
