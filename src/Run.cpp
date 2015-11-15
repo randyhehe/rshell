@@ -201,6 +201,92 @@ bool Run::singleCommandInParen(std::vector<std::string>& splitParams)
     return false;
 }
 
+void Run::runPrecedenceCheck(std::queue<std::string>& qCmd,
+                std::queue<std::string>& qCnct, 
+                std::vector<std::string>& splitParams,
+                bool& firstRun, bool& inParen, bool& hasHash,
+                bool& correctlyExecuted, bool& b, bool& c)
+{
+    c = false;
+
+    if(inParen && !qCmd.empty())
+    {
+        while(inParen && !qCmd.empty())
+        {
+            splitParams = Parse::prepareVector(qCmd.front(), hasHash);
+            if(splitParams.at(splitParams.size() - 1)
+                    .at(splitParams.at(splitParams.size() - 1).size() - 1) == ')')
+            {
+                inParen = false;
+                splitParams.at(splitParams.size() - 1) = 
+                    splitParams.at(splitParams.size() - 1).substr
+                    (0, splitParams.at(splitParams.size() - 1).size() - 1);
+            }
+
+            if(splitParams.at(0) == "exit")
+            {
+                b = false;
+                c = true;
+            }
+                    
+            if(firstRun == false)
+            {
+                qCmd.pop();
+                qCnct.pop();
+            }
+
+            else if(correctlyExecuted && firstRun)
+            {
+                if(qCnct.front() == "&&")
+                {
+                    And a(correctlyExecuted);
+                    if(a.executeNext())
+                        executeSingle(splitParams);
+                }
+
+                else if(qCnct.front() == "||")
+                {
+                    Or o(correctlyExecuted);
+                    if(o.executeNext())
+                        executeSingle(splitParams);
+                }
+            }
+
+            else if(!correctlyExecuted)
+            {
+                if(qCnct.front() == "&&")
+                {
+                    And a(correctlyExecuted);
+                    if(a.executeNext())
+                    {
+                        correctlyExecuted = executeSingle(splitParams);
+                    }
+                }
+                else if(qCnct.front() == "||")
+                {
+                    Or o(correctlyExecuted);
+                    if(o.executeNext())
+                        correctlyExecuted = executeSingle(splitParams);
+                }
+            }
+
+            if (hasHash)
+            {
+                b = true;
+                c = true;
+            }
+                    
+            if(firstRun == true)
+            {
+                qCmd.pop();
+                qCnct.pop();
+            }
+        }
+    }
+
+    return;
+}
+
 // Function attempts to execute all commands.
 // If "exit" is found, return false.
 // Return true if no exit is found.
@@ -306,73 +392,14 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
             qCmd.pop();
             qCnct.pop();
 
-            if(inParen && !qCmd.empty())
-            {
-                while(inParen && !qCmd.empty())
-                {
-                    splitParams = Parse::prepareVector(qCmd.front(), hasHash);
-                    if(splitParams.at(splitParams.size() - 1)
-                            .at(splitParams.at(splitParams.size() - 1).size() - 1) == ')')
-                    {
-                        inParen = false;
-                        splitParams.at(splitParams.size() - 1) = splitParams.at(splitParams.size() - 1).substr
-                            (0, splitParams.at(splitParams.size() - 1).size() - 1);
-                    }
-
-                    if(splitParams.at(0) == "exit")
-                        return false;
-                    
-                    if(firstRun == false)
-                    {
-                        qCmd.pop();
-                        qCnct.pop();
-                    }
-
-                    else if(correctlyExecuted && firstRun)
-                    {
-                        if(qCnct.front() == "&&")
-                        {
-                            And a(correctlyExecuted);
-                            if(a.executeNext())
-                                executeSingle(splitParams);
-                        }
-
-                        else if(qCnct.front() == "||")
-                        {
-                            Or o(correctlyExecuted);
-                            if(o.executeNext())
-                                executeSingle(splitParams);
-                        }
-                    }
-
-                    else if(!correctlyExecuted)
-                    {
-                        if(qCnct.front() == "&&")
-                        {
-                            And a(correctlyExecuted);
-                            if(a.executeNext())
-                            {
-                                correctlyExecuted = executeSingle(splitParams);
-                            }
-                        }
-                        else if(qCnct.front() == "||")
-                        {
-                            Or o(correctlyExecuted);
-                            if(o.executeNext())
-                                correctlyExecuted = executeSingle(splitParams);
-                        }
-                    }
-
-                    if (hasHash)
-                        return true;
-                    
-                    if(firstRun == true)
-                    {
-                        qCmd.pop();
-                        qCnct.pop();
-                    }
-                }
-            }
+            bool ret1;
+            bool ret2;
+            runPrecedenceCheck(qCmd, qCnct, splitParams, firstRun,
+                    inParen, hasHash, correctlyExecuted, ret1, ret2);
+            if(ret1 && ret2)
+                return true;
+            else if(!ret1 && ret2)
+                return false;
         }
         else if (qCnct.front() == "||")
         {
@@ -395,74 +422,17 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
 
             qCmd.pop();
             qCnct.pop();
-            
-            if(inParen && !qCmd.empty())
-            {
-                while(inParen && !qCmd.empty())
-                {
-                    splitParams = Parse::prepareVector(qCmd.front(), hasHash);
-                    if(splitParams.at(splitParams.size() - 1)
-                            .at(splitParams.at(splitParams.size() - 1).size() - 1) == ')')
-                    {
-                        inParen = false;
-                        splitParams.at(splitParams.size() - 1) = splitParams.at(splitParams.size() - 1).substr
-                            (0, splitParams.at(splitParams.size() - 1).size() - 1);
-                    }
 
-                    if(splitParams.at(0) == "exit")
-                        return false;
-                    
-                    if(firstRun == false)
-                    {
-                        qCmd.pop();
-                        qCnct.pop();
-                    }
-
-                    else if (correctlyExecuted && firstRun)
-                    {
-                        if(qCnct.front() == "&&")
-                        {
-                            And a(correctlyExecuted);
-                            if(a.executeNext())
-                                executeSingle(splitParams);
-                        }
-
-                        else if(qCnct.front() == "||")
-                        {
-                            Or o(correctlyExecuted);
-                            if(o.executeNext())
-                                executeSingle(splitParams);
-                        }
-                    }
-            
-                    else if(!correctlyExecuted && firstRun)
-                    {
-                        if(qCnct.front() == "&&")
-                        {
-                            And a(correctlyExecuted);
-                            if(a.executeNext())
-                                correctlyExecuted = executeSingle(splitParams);
-                        }
-
-                        else if(qCnct.front() == "||")
-                        {
-                            Or o(correctlyExecuted);
-                            if(o.executeNext())
-                                correctlyExecuted = executeSingle(splitParams);
-                        }
-                    }
-
-                    if (hasHash)
-                        return true;
-
-                    if(firstRun == true)
-                    {
-                        qCmd.pop();
-                        qCnct.pop();
-                    }
-                }
-            }
+            bool ret1;
+            bool ret2;
+            runPrecedenceCheck(qCmd, qCnct, splitParams, firstRun,
+                    inParen, hasHash, correctlyExecuted, ret1, ret2);
+            if(ret1 && ret2)
+                return true;
+            else if(!ret1 && ret2)
+                return false;
         }
+
         else if (qCnct.front() == ";")
         {
             Semicolon sc(correctlyExecuted);
@@ -474,8 +444,27 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                 correctlyExecuted = executeSingle(splitParams);
                 if (hasHash) 
                     return true;
+
+                firstRun = true;
             }
+            else
+            {
+                firstRun = false;
+            }
+
+            qCmd.pop();
+            qCnct.pop();
+
+            bool ret1;
+            bool ret2;
+            runPrecedenceCheck(qCmd, qCnct, splitParams, firstRun,
+                    inParen, hasHash, correctlyExecuted, ret1, ret2);
+            if(ret1 && ret2)
+                return true;
+            else if(!ret1 && ret2)
+                return false;
         }
+        
         else
         {
             qCnct.pop();
