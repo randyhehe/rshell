@@ -115,7 +115,6 @@ bool Run::runStat(std::vector<std::string>& v)
     if(stat(input, &fileStat) == -1)
     {
         perror("stat");
-        exit(EXIT_FAILURE);
     }
 
     // checks for regular file
@@ -469,6 +468,7 @@ bool Run::errorOnLeadingConnector(std::string userInput)
 bool Run::start(std::string userInput)
 {
     //check for leading
+
     if (errorOnLeadingConnector(userInput))
     {
         std::cout << "Error: Invalid Syntax." << std::endl;
@@ -496,6 +496,18 @@ bool Run::start(std::string userInput)
     bool isExit = executeAll(qCommands, qConnectors);
     if (!isExit)
         return false;
+
+    /* std::vector<std::string> v = Parse::stepOneParse(userInput);
+
+    std::cout << std::endl;
+    
+    v = Parse::stepTwoParse(v);
+
+    std::cout << std::endl;
+
+    v = Parse::stepThreeParse(v);
+    */
+
 
     return true;
 }
