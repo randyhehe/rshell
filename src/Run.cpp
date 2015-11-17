@@ -297,60 +297,10 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
         return true;
     
     bool inParen = false;
-
-    // hasHash = true if there is a comment in the current preparedVector 
     bool hasHash = false;
-    std::vector<std::string> splitParams = Parse::prepareVector
-        (qCmd.front(), hasHash);
-
-    // if statement for when a single command is in a parenthesis
-    bool isSingleParen = singleCommandInParen(splitParams);
-    
-    // else if statement for when a single command only has '('
-    if(splitParams.at(0).at(0) == '(' && !isSingleParen)
-    {
-        inParen = true;
-        splitParams.at(0) = splitParams.at(0).substr
-            (1, splitParams.at(0).size() - 1);
-    }
-
-    if (splitParams.at(0) == "exit")
-        return false;
-    
-    bool correctlyExecuted = executeSingle(splitParams);
-
-    if (hasHash)
-        return true;
-
-    qCmd.pop();
-
-    while(inParen && !qCmd.empty())
-    {
-        splitParams = Parse::prepareVector(qCmd.front(), hasHash);
-        if(splitParams.at(splitParams.size() - 1)
-                .at(splitParams.at(splitParams.size() - 1).size() - 1) == ')')
-        {
-            inParen = false;
-            splitParams.at(splitParams.size() - 1) = 
-                splitParams.at(splitParams.size() - 1).substr
-                (0, splitParams.at(splitParams.size() - 1).size() - 1);
-
-            if(splitParams.at(0) == "exit")
-                return false;
-
-            if(correctlyExecuted)
-                executeSingle(splitParams);
-
-            else if(!correctlyExecuted)
-                correctlyExecuted = executeSingle(splitParams);
-
-            if (hasHash)
-                return true;
-        }
-        
-        qCnct.pop();
-        qCmd.pop();
-    }
+    bool isSingleParen = false;
+    bool correctlyExecuted = false;
+    std::vector<std::string> splitParams;
 
     // While there are still commands, keep executing until a comment or exit
     // disrupts the loop.
