@@ -182,9 +182,10 @@ bool Run::parsePrecedence(std::queue<std::string>& qCmd,
 {
     std::vector<std::string> splitParams = Parse::prepareVector(qCmd.front(), hasHash);
 
-    unsigned numNested = 0;
+    int numNested = 0;
     char lastChar = splitParams.at(splitParams.size() - 1).at
-        (splitParams.at(splitParams.size() - 1).size() - 1) == ')';
+        (splitParams.at(splitParams.size() - 1).size() - 1);
+
     do
     {
         if(qCnct.empty() || qCmd.empty())
@@ -198,14 +199,42 @@ bool Run::parsePrecedence(std::queue<std::string>& qCmd,
         char firstChar = splitParams.at(0).at(0);
         lastChar = splitParams.at(splitParams.size() - 1).at
             (splitParams.at(splitParams.size() - 1).size() - 1);
-                
-        if(firstChar == '(')
+             
+        while(firstChar == '(')
+        {
             numNested++;
 
-        else if(lastChar == ')' && numNested > 0)
+            splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+            firstChar = splitParams.at(0).at(0);
+        }
+        
+        bool foundEnd = false; 
+        while(lastChar == ')' && numNested > -1)
+        {
             numNested--;
 
-    } while(numNested == 0 && lastChar != ')');
+            splitParams.at(splitParams.size() - 1) =
+                splitParams.at(splitParams.size() - 1).substr
+                (0, splitParams.at(splitParams.size() - 1).size() - 1);
+
+            lastChar = splitParams.at(splitParams.size() - 1).at
+                (splitParams.at(splitParams.size() - 1).size() - 1);
+
+            foundEnd = true;
+        }
+
+        //if(firstChar == '(')
+       //     numNested++;
+
+       // else if(lastChar == ')' && numNested > -1)
+       //     numNested--;
+        
+        // std::cout << numNested << std::endl;
+
+        if(numNested == -1 && foundEnd)
+            break;
+
+    } while(true);
 
     return false;
 }
@@ -238,15 +267,24 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
             char lastChar = splitParams.at(splitParams.size() - 1).at
                 (splitParams.at(splitParams.size() - 1).size() - 1);
 
-            if(firstChar == '(')
+            bool frontP = false;
+            while(firstChar == '(')
+            {
+                frontP = true;
                 splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+                firstChar = splitParams.at(0).at(0);
+            } 
             
-            if(lastChar == ')')
+            while(lastChar == ')')
+            {
                 splitParams.at(splitParams.size() - 1) =
                     splitParams.at(splitParams.size() - 1).substr
                     (0, splitParams.at(splitParams.size() - 1).size() - 1);
+                lastChar = splitParams.at(splitParams.size() - 1).at
+                    (splitParams.at(splitParams.size() - 1).size() - 1);
+            }
 
-            if(!a.executeNext() && firstChar == '(')
+            if(!a.executeNext() && frontP)
             {
                 bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
                 if(temp)
@@ -273,16 +311,25 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
             char firstChar = splitParams.at(0).at(0);
             char lastChar = splitParams.at(splitParams.size() - 1).at
                 (splitParams.at(splitParams.size() - 1).size() - 1);
-
-            if(firstChar == '(')
-                splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
             
-            if(lastChar == ')')
+            bool frontP = false;
+            while(firstChar == '(')
+            {
+                frontP = true;
+                splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+                firstChar = splitParams.at(0).at(0);
+            }
+            
+            while(lastChar == ')')
+            {
                 splitParams.at(splitParams.size() - 1) =
                     splitParams.at(splitParams.size() - 1).substr
                     (0, splitParams.at(splitParams.size() - 1).size() - 1);
+                lastChar = splitParams.at(splitParams.size() - 1).at
+                    (splitParams.at(splitParams.size() - 1).size() - 1);
+            }
 
-            if(!o.executeNext() && firstChar == '(')
+            if(!o.executeNext() && frontP)
             {
                 bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
                 if(temp)
@@ -310,15 +357,24 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
             char lastChar = splitParams.at(splitParams.size() - 1).at
                 (splitParams.at(splitParams.size() - 1).size() - 1);
 
-            if(firstChar == '(')
+            bool frontP = false;
+            while(firstChar == '(')
+            {
+                frontP = true;
                 splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+                firstChar = splitParams.at(0).at(0);
+            }
             
-            if(lastChar == ')')
+            while(lastChar == ')')
+            {
                 splitParams.at(splitParams.size() - 1) =
                     splitParams.at(splitParams.size() - 1).substr
                     (0, splitParams.at(splitParams.size() - 1).size() - 1);
+                lastChar = splitParams.at(splitParams.size() - 1).at
+                    (splitParams.at(splitParams.size() - 1).size() - 1);
+            }
 
-            if(!sc.executeNext() && firstChar == '(')
+            if(!sc.executeNext() && frontP)
             {
                 bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
                 if(temp)
