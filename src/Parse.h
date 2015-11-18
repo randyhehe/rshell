@@ -23,6 +23,12 @@ class Parse
         static std::queue<std::string> parseConnector(std::string s, bool &b);
         static std::vector<std::string> prepareVector(std::string s, bool &b);
         static bool errorLeadingConnector(std::string s);
+
+        /*
+        static std::vector<std::string> stepOneParse(std::string s);
+        static std::vector<std::string> stepTwoParse(std::vector<std::string> v);
+        static std::vector<std::string> stepThreeParse(std::vector<std::string> v);
+        */
 };
 
 #endif

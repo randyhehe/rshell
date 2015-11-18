@@ -24,7 +24,11 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
     std::queue<std::string> que;
 
     t_tokenizer tok(s, c);
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 7c944e4c3fe160316ad6239361faf29ce70f8d78
     que.push(";");
     for (t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
     {
@@ -82,7 +86,64 @@ bool Parse::errorLeadingConnector(std::string s)
 
     return false;
 }
+
+/*
+std::vector<std::string> Parse::stepOneParse(std::string s)
+{
+    cs sep(" ");
     
+    std::vector<std::string> vecStrings;
+    t_tokenizer tok(s, sep);
+    for (t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
+        vecStrings.push_back(*beg);
+
+    for(unsigned i = 0; i < vecStrings.size(); i++)
+        std::cout << vecStrings.at(i) << std::endl;
+
+    return vecStrings;
+}
+
+std::vector<std::string> Parse::stepTwoParse(std::vector<std::string> v)
+{
+    cs sep ("", ";&|");
+
+    std::vector<std::string> vecStrings;
+    for(unsigned i = 0; i < v.size(); i++)
+    {
+        t_tokenizer tok(v.at(i), sep);
+        for(t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
+        {
+            if(*beg == "&" && vecStrings.at(vecStrings.size() - 1) == "&")
+                vecStrings.at(vecStrings.size() - 1) = "&&";
+
+            else if(*beg == "|" && vecStrings.at(vecStrings.size() - 1) == "|")
+                vecStrings.at(vecStrings.size() - 1) == "||";
+
+            else
+                vecStrings.push_back(*beg);
+        }
+    }
+
+    for(unsigned i = 0; i < vecStrings.size(); i++)
+        std::cout << vecStrings.at(i) << std::endl;
+
+
+    return vecStrings;
+}
+
+std::vector<std::string> Parse::stepThreeParse(std::vector<std::string> v)
+{
+    bool b = false;
+
+    v = splitHash(v, b);
+
+    for(unsigned i = 0; i < v.size(); i++)
+        std::cout << v.at(i) << std::endl;
+
+    return v;
+}
+*/
+
 // Parses for commands and returns a queue filled with string of commands.
 std::queue<std::string> Parse::parseCommand(std::string s)
 {

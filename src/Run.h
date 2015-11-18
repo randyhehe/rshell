@@ -40,6 +40,13 @@ class Run
         bool runExec(std::vector<std::string>& v);
         bool runStat(std::vector<std::string>& v);
         char* stringToCharPtr(std::string s);
+        bool singleCommandInParen(std::vector<std::string>& splitCommands);
+        void runPrecedenceCheck(std::queue<std::string>& qCmd,
+                std::queue<std::string>& qCnct, 
+                std::vector<std::string>& splitParams,
+                bool& firstRun, bool& inParen, bool& hasHash,
+                bool& correctlyExecuted, bool& b, bool& c);
+
 
     public:
         bool start(std::string userInput);
