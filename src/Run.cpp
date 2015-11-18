@@ -223,14 +223,6 @@ bool Run::parsePrecedence(std::queue<std::string>& qCmd,
             foundEnd = true;
         }
 
-        //if(firstChar == '(')
-       //     numNested++;
-
-       // else if(lastChar == ')' && numNested > -1)
-       //     numNested--;
-        
-        // std::cout << numNested << std::endl;
-
         if(numNested == -1 && foundEnd)
             break;
 
