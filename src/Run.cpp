@@ -113,10 +113,7 @@ bool Run::runStat(std::vector<std::string>& v)
     struct stat fileStat;
 
     if(stat(input, &fileStat) == -1)
-    {
         perror("stat");
-        exit(EXIT_FAILURE);
-    }
 
     // checks for regular file
     if(file)
@@ -180,52 +177,122 @@ bool Run::executeSingle(std::vector<std::string>& v)
         return runExec(v);
 }
 
+bool Run::parsePrecedence(std::queue<std::string>& qCmd,
+        std::queue<std::string>& qCnct, bool& correctlyExecuted, bool& hasHash)
+{
+    std::vector<std::string> splitParams = Parse::prepareVector(qCmd.front(), hasHash);
+
+    unsigned numNested = 0;
+    char lastChar = splitParams.at(splitParams.size() - 1).at
+        (splitParams.at(splitParams.size() - 1).size() - 1) == ')';
+    do
+    {
+        if(qCnct.empty() || qCmd.empty())
+            return true;
+
+        qCnct.pop();
+        qCmd.pop();
+
+        splitParams = Parse::prepareVector(qCmd.front(), hasHash);
+
+        char firstChar = splitParams.at(0).at(0);
+        lastChar = splitParams.at(splitParams.size() - 1).at
+            (splitParams.at(splitParams.size() - 1).size() - 1);
+                
+        if(firstChar == '(')
+            numNested++;
+
+        else if(lastChar == ')' && numNested > 0)
+            numNested--;
+
+    } while(numNested == 0 && lastChar != ')');
+
+    return false;
+}
+
 // Function attempts to execute all commands.
 // If "exit" is found, return false.
 // Return true if no exit is found.
+// Turn B to true if a syntax error occured.
 bool Run::executeAll(std::queue<std::string>& qCmd, 
-        std::queue<std::string>& qCnct)
+        std::queue<std::string>& qCnct, bool& b)
 {
     if (qCmd.empty())
         return true;
 
     // hasHash = true if there is a comment in the current preparedVector 
     bool hasHash = false;
-    std::vector<std::string> splitParams = Parse::prepareVector
-        (qCmd.front(), hasHash);
+    bool correctlyExecuted = false;
 
-    if (splitParams.at(0) == "exit")
-        return false;
-    
-    bool correctlyExecuted = executeSingle(splitParams);
-
-    if (hasHash)
-        return true;
-
-    qCmd.pop();
-    
     // While there are still commands, keep executing until a comment or exit
     // disrupts the loop.
     while (!qCmd.empty())
     {
-        splitParams = Parse::prepareVector(qCmd.front(), hasHash);
+        std::vector<std::string> splitParams = Parse::prepareVector(qCmd.front(), hasHash);
 
         if (qCnct.front() == "&&")
         {
             And a(correctlyExecuted);
-            if (a.executeNext())
+
+            char firstChar = splitParams.at(0).at(0);
+            char lastChar = splitParams.at(splitParams.size() - 1).at
+                (splitParams.at(splitParams.size() - 1).size() - 1);
+
+            if(firstChar == '(')
+                splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+            
+            if(lastChar == ')')
+                splitParams.at(splitParams.size() - 1) =
+                    splitParams.at(splitParams.size() - 1).substr
+                    (0, splitParams.at(splitParams.size() - 1).size() - 1);
+
+            if(!a.executeNext() && firstChar == '(')
+            {
+                bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
+                if(temp)
+                {
+                    b = true;
+                    return true;
+                }
+            }
+
+            else if (a.executeNext())
             {
                 if (splitParams.at(0) == "exit")
                     return false;
 
-                correctlyExecuted = executeSingle(splitParams);}
+                correctlyExecuted = executeSingle(splitParams);
                 if (hasHash) 
                     return true;
+            }
         }
         else if (qCnct.front() == "||")
         {
             Or o(correctlyExecuted);
-            if (o.executeNext())
+            
+            char firstChar = splitParams.at(0).at(0);
+            char lastChar = splitParams.at(splitParams.size() - 1).at
+                (splitParams.at(splitParams.size() - 1).size() - 1);
+
+            if(firstChar == '(')
+                splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+            
+            if(lastChar == ')')
+                splitParams.at(splitParams.size() - 1) =
+                    splitParams.at(splitParams.size() - 1).substr
+                    (0, splitParams.at(splitParams.size() - 1).size() - 1);
+
+            if(!o.executeNext() && firstChar == '(')
+            {
+                bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
+                if(temp)
+                {
+                    b = true;
+                    return true;
+                }
+            }
+
+            else if (o.executeNext())
             {
                 if (splitParams.at(0) == "exit")
                     return false;
@@ -238,7 +305,30 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
         else if (qCnct.front() == ";")
         {
             Semicolon sc(correctlyExecuted);
-            if (sc.executeNext())
+
+            char firstChar = splitParams.at(0).at(0);
+            char lastChar = splitParams.at(splitParams.size() - 1).at
+                (splitParams.at(splitParams.size() - 1).size() - 1);
+
+            if(firstChar == '(')
+                splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+            
+            if(lastChar == ')')
+                splitParams.at(splitParams.size() - 1) =
+                    splitParams.at(splitParams.size() - 1).substr
+                    (0, splitParams.at(splitParams.size() - 1).size() - 1);
+
+            if(!sc.executeNext() && firstChar == '(')
+            {
+                bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
+                if(temp)
+                {
+                    b = true;
+                    return true;
+                }
+            }
+
+            else if (sc.executeNext())
             {
                 if (splitParams.at(0) == "exit")
                     return false;
@@ -323,7 +413,11 @@ bool Run::start(std::string userInput)
         return true;
     }
     
-    bool isExit = executeAll(qCommands, qConnectors);
+    bool syntaxErr = false;
+    bool isExit = executeAll(qCommands, qConnectors, syntaxErr);
+    if(syntaxErr)
+        std::cout << "Error: Invalid Syntax." << std::endl;
+
     if (!isExit)
         return false;
 

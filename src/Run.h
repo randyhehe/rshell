@@ -29,8 +29,14 @@ class Run
         std::vector<char*> toCharPointers(std::vector<std::string> &v);
         bool executeSingle(std::vector<std::string>& v);
         bool executeAll(std::queue<std::string>& qCmd, 
-                std::queue<std::string>& qCnct);
+                std::queue<std::string>& qCnct, bool& b);
         bool errorOnLeadingConnector(std::string s);
+
+        bool parsePrecedence(std::queue<std::string>& qCmd,
+        std::queue<std::string>& qCnct, bool& correctlyExecuted, bool& hasHash);
+
+        
+
         bool runExec(std::vector<std::string>& v);
         bool runStat(std::vector<std::string>& v);
         char* stringToCharPtr(std::string s);

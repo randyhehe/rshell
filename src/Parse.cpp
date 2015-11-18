@@ -25,6 +25,7 @@ std::queue<std::string> Parse::parseConnector(std::string s, bool& b)
 
     t_tokenizer tok(s, c);
 
+    que.push(";");
     for (t_tokenizer::iterator beg = tok.begin(); beg != tok.end(); beg++)
     {
         std::string f = *beg;
