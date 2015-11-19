@@ -21,28 +21,28 @@ bool Run::runExec(std::vector<std::string>& v)
     int status;
     int exeVal;
     pid_t processID = fork();
-    if(processID < 0)
+    if (processID < 0)
     {
         perror("fork failed");
         exit(1);
     }
-    else if(processID == 0)
+    else if (processID == 0)
     {
         execvp(listCommands[0], listCommands);
         perror("execvp failed");
         exit(errno);
     }
-    else if((processID = wait(&status)) < 0)
+    else if ((processID = wait(&status)) < 0)
     {
         perror("wait failed");
         exit(1);
     }
 
     // Error check and return boolean value accordingly
-    if(WIFEXITED(status))
+    if (WIFEXITED(status))
         exeVal = WEXITSTATUS(status);
 
-    if(exeVal == 0)
+    if (exeVal == 0)
         return true;
 
     return false;
@@ -61,34 +61,34 @@ bool Run::runStat(std::vector<std::string>& v)
     bool dir = false;
     bool all = false;
 
-    if(v.begin() != v.end() && *v.begin() == "[" && *(--v.end()) != "]")
+    if (v.begin() != v.end() && *v.begin() == "[" && *(--v.end()) != "]")
     {
         std::cout << "Error: Invalid Syntax." << std::endl;
         return 1;
     }
 
-    if(v.begin() != v.end())
+    if (v.begin() != v.end())
         v.erase(v.begin());
 
-    if(v.begin() == v.end())
+    if (v.begin() == v.end())
     {
         std::cout << "Error: Invalid Syntax." << std::endl;
         return 1;
     }
 
-    if(v.begin() != v.end())
+    if (v.begin() != v.end())
     {
-        if(*v.begin() == "-f")
+        if (*v.begin() == "-f")
         {   file = true;
             v.erase(v.begin());
         }
 
-        else if(*v.begin() == "-d")
+        else if (*v.begin() == "-d")
         {
             dir = true;
             v.erase(v.begin());
         }
-        else if(*v.begin() == "-e")
+        else if (*v.begin() == "-e")
         {
             all = true;
             v.erase(v.begin());
@@ -97,9 +97,9 @@ bool Run::runStat(std::vector<std::string>& v)
             all = true;
     }
 
-    while(v.size() > 1)
+    while (v.size() > 1)
     {
-        if(v.at(1) == "]")
+        if (v.at(1) == "]")
         {
             v.erase(v.begin() + 1);
             break;
@@ -112,13 +112,13 @@ bool Run::runStat(std::vector<std::string>& v)
 
     struct stat fileStat;
 
-    if(stat(input, &fileStat) == -1)
+    if (stat(input, &fileStat) == -1)
         perror("stat");
 
     // checks for regular file
-    if(file)
+    if (file)
     {
-        switch(fileStat.st_mode & S_IFMT)
+        switch (fileStat.st_mode & S_IFMT)
         {
             case S_IFREG:
                 return 0;
@@ -131,9 +131,9 @@ bool Run::runStat(std::vector<std::string>& v)
     }
     
         // checks for directory
-    else if(dir)
+    else if (dir)
     {
-        switch(fileStat.st_mode & S_IFMT)
+        switch (fileStat.st_mode & S_IFMT)
         {
             case S_IFDIR:
                 return 0;
@@ -146,9 +146,9 @@ bool Run::runStat(std::vector<std::string>& v)
         }
     
     // checks for either regular file or directory
-    else if(all)
+    else if (all)
     {
-        switch(fileStat.st_mode & S_IFMT)
+        switch (fileStat.st_mode & S_IFMT)
         {
             case S_IFREG:
                 return 0;
@@ -169,7 +169,7 @@ bool Run::runStat(std::vector<std::string>& v)
 bool Run::executeSingle(std::vector<std::string>& v)
 {
     // if first string is "test" then do stat instead of execvp
-    if(v.at(0) == "test" || v.at(0) == "[")
+    if (v.at(0) == "test" || v.at(0) == "[")
         return !runStat(v);
 
     // Start execvp process
@@ -180,7 +180,8 @@ bool Run::executeSingle(std::vector<std::string>& v)
 bool Run::parsePrecedence(std::queue<std::string>& qCmd,
         std::queue<std::string>& qCnct, bool& correctlyExecuted, bool& hasHash)
 {
-    std::vector<std::string> splitParams = Parse::prepareVector(qCmd.front(), hasHash);
+    std::vector<std::string> splitParams = 
+        Parse::prepareVector(qCmd.front(), hasHash);
 
     int numNested = 0;
     char lastChar = splitParams.at(splitParams.size() - 1).at
@@ -188,7 +189,7 @@ bool Run::parsePrecedence(std::queue<std::string>& qCmd,
 
     do
     {
-        if(qCnct.empty() || qCmd.empty())
+        if (qCnct.empty() || qCmd.empty())
             return true;
 
         qCnct.pop();
@@ -200,16 +201,18 @@ bool Run::parsePrecedence(std::queue<std::string>& qCmd,
         lastChar = splitParams.at(splitParams.size() - 1).at
             (splitParams.at(splitParams.size() - 1).size() - 1);
              
-        while(firstChar == '(')
+        while (firstChar == '(')
         {
             numNested++;
 
-            splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+            splitParams.at(0) = splitParams.at(0)
+                .substr(1, splitParams.at(0).size() - 1);
+
             firstChar = splitParams.at(0).at(0);
         }
         
         bool foundEnd = false; 
-        while(lastChar == ')' && numNested > -1)
+        while (lastChar == ')' && numNested > -1)
         {
             numNested--;
 
@@ -223,10 +226,10 @@ bool Run::parsePrecedence(std::queue<std::string>& qCmd,
             foundEnd = true;
         }
 
-        if(numNested == -1 && foundEnd)
+        if (numNested == -1 && foundEnd)
             break;
 
-    } while(true);
+    } while (true);
 
     return false;
 }
@@ -249,7 +252,8 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
     // disrupts the loop.
     while (!qCmd.empty())
     {
-        std::vector<std::string> splitParams = Parse::prepareVector(qCmd.front(), hasHash);
+        std::vector<std::string> splitParams = 
+            Parse::prepareVector(qCmd.front(), hasHash);
 
         if (qCnct.front() == "&&")
         {
@@ -260,26 +264,31 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                 (splitParams.at(splitParams.size() - 1).size() - 1);
 
             bool frontP = false;
-            while(firstChar == '(')
+            while (firstChar == '(')
             {
                 frontP = true;
-                splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+                splitParams.at(0) = splitParams.at(0)
+                    .substr(1, splitParams.at(0).size() - 1);
+                
                 firstChar = splitParams.at(0).at(0);
             } 
             
-            while(lastChar == ')')
+            while (lastChar == ')')
             {
                 splitParams.at(splitParams.size() - 1) =
                     splitParams.at(splitParams.size() - 1).substr
                     (0, splitParams.at(splitParams.size() - 1).size() - 1);
+                
                 lastChar = splitParams.at(splitParams.size() - 1).at
                     (splitParams.at(splitParams.size() - 1).size() - 1);
             }
 
-            if(!a.executeNext() && frontP)
+            if (!a.executeNext() && frontP)
             {
-                bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
-                if(temp)
+                bool temp = parsePrecedence
+                    (qCmd, qCnct, correctlyExecuted, hasHash);
+
+                if (temp)
                 {
                     b = true;
                     return true;
@@ -305,14 +314,16 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                 (splitParams.at(splitParams.size() - 1).size() - 1);
             
             bool frontP = false;
-            while(firstChar == '(')
+            while (firstChar == '(')
             {
                 frontP = true;
-                splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+                splitParams.at(0) = splitParams.at(0)
+                    .substr(1, splitParams.at(0).size() - 1);
+
                 firstChar = splitParams.at(0).at(0);
             }
             
-            while(lastChar == ')')
+            while (lastChar == ')')
             {
                 splitParams.at(splitParams.size() - 1) =
                     splitParams.at(splitParams.size() - 1).substr
@@ -321,10 +332,12 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                     (splitParams.at(splitParams.size() - 1).size() - 1);
             }
 
-            if(!o.executeNext() && frontP)
+            if (!o.executeNext() && frontP)
             {
-                bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
-                if(temp)
+                bool temp = parsePrecedence
+                    (qCmd, qCnct, correctlyExecuted, hasHash);
+
+                if (temp)
                 {
                     b = true;
                     return true;
@@ -350,14 +363,16 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                 (splitParams.at(splitParams.size() - 1).size() - 1);
 
             bool frontP = false;
-            while(firstChar == '(')
+            while (firstChar == '(')
             {
                 frontP = true;
-                splitParams.at(0) = splitParams.at(0).substr(1, splitParams.at(0).size() - 1);
+                splitParams.at(0) = splitParams.at(0)
+                    .substr(1, splitParams.at(0).size() - 1);
+
                 firstChar = splitParams.at(0).at(0);
             }
             
-            while(lastChar == ')')
+            while (lastChar == ')')
             {
                 splitParams.at(splitParams.size() - 1) =
                     splitParams.at(splitParams.size() - 1).substr
@@ -366,10 +381,12 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                     (splitParams.at(splitParams.size() - 1).size() - 1);
             }
 
-            if(!sc.executeNext() && frontP)
+            if (!sc.executeNext() && frontP)
             {
-                bool temp = parsePrecedence(qCmd, qCnct, correctlyExecuted, hasHash);
-                if(temp)
+                bool temp = parsePrecedence
+                    (qCmd, qCnct, correctlyExecuted, hasHash);
+
+                if (temp)
                 {
                     b = true;
                     return true;
@@ -448,7 +465,9 @@ bool Run::start(std::string userInput)
     
     // check for errors when parsing connector
     bool err = false;
-    std::queue<std::string> qConnectors = Parse::parseConnector(userInput, err);
+    std::queue<std::string> qConnectors = 
+        Parse::parseConnector(userInput, err);
+
     if (err)
     {
         std::cout << "Error: Invalid Syntax." << std::endl;
@@ -464,7 +483,7 @@ bool Run::start(std::string userInput)
     
     bool syntaxErr = false;
     bool isExit = executeAll(qCommands, qConnectors, syntaxErr);
-    if(syntaxErr)
+    if (syntaxErr)
         std::cout << "Error: Invalid Syntax." << std::endl;
 
     if (!isExit)

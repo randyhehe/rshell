@@ -15,10 +15,11 @@ int main()
 
         std::string userInput;
         std::getline(std::cin, userInput);
-
+        
+        // b will return false if start failed
         bool b = run.start(userInput);
 
-        if(!b)
+        if (!b)
             return 0;
     }
 
