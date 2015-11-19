@@ -24,5 +24,4 @@ class Parse
         static std::vector<std::string> prepareVector(std::string s, bool &b);
         static bool errorLeadingConnector(std::string s);
 };
-
 #endif

@@ -1,0 +1,63 @@
+Script started on Thu 19 Nov 2015 12:04:22 AM PST
+randyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ make
+rm -rfv bin
+mkdir -p bin
+g++ -Wall -Werror -ansi -pedantic -I boost_1_59_0 src/main.cpp src/Connector.cpp src/Or.cpp src/And.cpp src/Semicolon.cpp src/Run.cpp src/Parse.cpp -o bin/rshell
+randyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+randyhe@Y510P$ echo A && echooBb|| echo C && echo D
+A
+B
+D
+randyhe@Y510P$ (echo A && echo B) || (echo C && echo D)
+A
+B
+randyhe@Y510P$ (echo A && echo B) && (echo C && echo D)
+A
+B
+C
+D
+randyhe@Y510P$ (echo A && echo B) && (echo C || echo D)
+A
+B
+C
+randyhe@Y510P$ (echo A && echo B) && (falseC|| echo D)
+A
+B
+D
+randyhe@Y510P$ (false && false) || (echo C && echo D)
+C
+D
+randyhe@Y510P$ echolA &&&(echoBB && (echoCC && echo D) && echo E) && echo F
+A
+B
+C
+D
+E
+F
+randyhe@Y510P$ echooA || (echo B && (echo C && echo D) && echo E))&& echo F
+A
+F
+randyhe@Y510P$ echo A || (echo B && (echo C && echo D) && echo E) || echo F
+A
+randyhe@Y510P$ echo A && (echo B || (echo C && echo D) || echo E) && echo F
+A
+B
+F
+randyhe@Y510P$ echo A && (echo B || (echo C && echo D) || echo E) || echo F
+A
+B
+randyhe@Y510P$ echo A && (echo B || (echo || echo D) && echo E) && echo F
+A
+B
+E
+F
+randyhe@Y510P$ false && (echo B || (echo C||| echo D) && echo E) || echo F
+F
+randyhe@Y510P$ false || (echo C && echooD)
+C
+D
+randyhe@Y510P$ exit
+randyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ exit
+exit
+
+Script done on Thu 19 Nov 2015 12:11:04 AM PST

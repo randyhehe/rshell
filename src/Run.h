@@ -8,12 +8,14 @@
 #include <utility>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <sys/wait.h>
 #include <errno.h>
 #include <limits.h>
 #include <pwd.h>
 #include <sstream>
+#include <signal.h>
 
 #include "And.h"
 #include "Connector.h"
@@ -27,8 +29,15 @@ class Run
         std::vector<char*> toCharPointers(std::vector<std::string> &v);
         bool executeSingle(std::vector<std::string>& v);
         bool executeAll(std::queue<std::string>& qCmd, 
-                std::queue<std::string>& qCnct);
+                std::queue<std::string>& qCnct, bool& b);
         bool errorOnLeadingConnector(std::string s);
+        bool parsePrecedence(std::queue<std::string>& qCmd,
+        std::queue<std::string>& qCnct, bool& correctlyExecuted, bool& hasHash);
+
+        bool runExec(std::vector<std::string>& v);
+        bool runStat(std::vector<std::string>& v);
+        char* stringToCharPtr(std::string s);
+
 
     public:
         bool start(std::string userInput);

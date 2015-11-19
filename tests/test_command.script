@@ -1,0 +1,70 @@
+Script started on Wed 18 Nov 2015 11:26:40 PM PST
+randyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ make
+rm -rfv bin
+mkdir -p bin
+g++ -Wall -Werror -ansi -pedantic -I boost_1_59_0 src/main.cpp src/Connector.cpp src/Or.cpp src/And.cpp src/Semicolon.cpp src/Run.cpp src/Parse.cpp -o bin/rshell
+randyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ bin/rshell
+randyhe@Y510P$ ls
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+randyhe@Y510P$ test bin && echo hi
+hi
+randyhe@Y510P$ test -e bin && echo hi
+hi
+randyhe@Y510P$ tset -f bin && echo hi
+tset: invalid option -- 'f'
+Usage: tset [options] [terminal]
+
+Options:
+  -c	      set control characters
+  -e ch       erase character
+  -I	      no initialization strings
+  -i ch       interrupt character
+  -k ch       kill character
+  -m mapping  map identifier to type
+  -Q	      do not output control key settings
+  -r	      display term on stderr
+  -s	      output TERM set command
+  -V	      print curses-version
+  -w	      set window-size
+
+randyhe@Y510P$ test--fbbin && echo hi
+randyhe@Y510P$ tset -d bin && echo hi
+hi
+randyhe@Y510P$ test -d bin && echo hi
+hi
+randyhe@Y510P$ [ -esbin ] && echo hi
+hi
+randyhe@Y510P$ [ bin ] && echo hi
+hi
+randyhe@Y510P$ [ -f bin ] && echo hi
+randyhe@Y510P$ [ -d bin ] && echo hi
+hi
+randyhe@Y510P$ test Makefileh&& echo hi
+hi
+randyhe@Y510P$ test -f Makefile && echo hi
+hi
+randyhe@Y510P$ test -d Makefile|||eecho hi
+hi
+randyhe@Y510P$ test -e Makefile && echo hi
+hi
+randyhe@Y510P$ ls
+bin  boost_1_59_0  LICENSE  Makefile  README.md  src  tests  typescript
+randyhe@Y510P$ [ -f bin]] || [ -f boost_1_59_0 ] || [ -d LICENSE] || echo""hi"
+Error: Invalid Syntax.
+hi
+randyhe@Y510P$ [ -f bin ] || [ -f boost_1_59_0 ] || [ -d LICENSE ] || echo "hi"
+hi
+randyhe@Y510P$ [bin]in
+execvp failed: No such file or directory
+randyhe@Y510P$ [bin ]
+execvp failed: No such file or directory
+randyhe@Y510P$ [ bin]
+Error: Invalid Syntax.
+randyhe@Y510P$ [ bin ]
+randyhe@Y510P$ quit
+execvp failed: No such file or directory
+randyhe@Y510P$ exit
+randyhe@Y510P:~/Documents/FALL2015/CS100/rshell$ exit
+exit
+
+Script done on Wed 18 Nov 2015 11:30:22 PM PST
