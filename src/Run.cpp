@@ -48,6 +48,7 @@ bool Run::runExec(std::vector<std::string>& v)
     return false;
 }
 
+// Converts a string to character pointer
 char* Run::stringToCharPtr(std::string s)
 {
     char* temp = &s.at(0);
@@ -166,6 +167,9 @@ bool Run::runStat(std::vector<std::string>& v)
     return 1;
 }
 
+// Execute a single command.
+// Depending on the first word of the input, will either execute runStat or 
+// runExec.
 bool Run::executeSingle(std::vector<std::string>& v)
 {
     // if first string is "test" then do stat instead of execvp
@@ -177,16 +181,21 @@ bool Run::executeSingle(std::vector<std::string>& v)
         return runExec(v);
 }
 
+// Implements the precedence operators functionality.
+// This function is only called when the following items inside of precedence
+// should NOT be executed.
 bool Run::parsePrecedence(std::queue<std::string>& qCmd,
         std::queue<std::string>& qCnct, bool& correctlyExecuted, bool& hasHash)
 {
     std::vector<std::string> splitParams = 
         Parse::prepareVector(qCmd.front(), hasHash);
 
+    // numNested keeps track of how many nested parenthesis there are.
     int numNested = 0;
     char lastChar = splitParams.at(splitParams.size() - 1).at
         (splitParams.at(splitParams.size() - 1).size() - 1);
 
+    // Deletes entries until it can find the corresponding )
     do
     {
         if (qCnct.empty() || qCmd.empty())
@@ -263,6 +272,7 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
             char lastChar = splitParams.at(splitParams.size() - 1).at
                 (splitParams.at(splitParams.size() - 1).size() - 1);
 
+            // frontP = true if ( is found
             bool frontP = false;
             while (firstChar == '(')
             {
@@ -282,7 +292,9 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                 lastChar = splitParams.at(splitParams.size() - 1).at
                     (splitParams.at(splitParams.size() - 1).size() - 1);
             }
-
+            
+            // execute parsePrecedence if there is a start paren and 
+            // executeNext is false.
             if (!a.executeNext() && frontP)
             {
                 bool temp = parsePrecedence
@@ -332,6 +344,8 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                     (splitParams.at(splitParams.size() - 1).size() - 1);
             }
 
+            // execute parsePrecedence if there is a start paren and 
+            // executeNext is false.
             if (!o.executeNext() && frontP)
             {
                 bool temp = parsePrecedence
@@ -381,6 +395,8 @@ bool Run::executeAll(std::queue<std::string>& qCmd,
                     (splitParams.at(splitParams.size() - 1).size() - 1);
             }
 
+            // execute parsePrecedence if there is a start paren and 
+            // executeNext is false.
             if (!sc.executeNext() && frontP)
             {
                 bool temp = parsePrecedence
